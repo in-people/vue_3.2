@@ -113,18 +113,18 @@
     border: none !important;
 
     .el-menu-item {  // 菜单项
-      color: #fff !important;
+      color: #fff !important;  // 默认白色
       background-color: #1f2d3d !important;
       height: 56px;
       line-height: 56px;
 
       &:hover {  // 悬停状态
-        color: #ffd04b !important;
+        color: #ffd04b !important;  // 悬停黄色
         background-color: #263445 !important;
       }
 
       &.is-active {  // 激活状态
-        color: #ffd04b !important;
+        color: #ffd04b !important;  // 激活黄色
       }
     }
   }
@@ -180,16 +180,16 @@
     min-width: 200px !important;
 
     .el-menu-item {
-      color: #fff !important;
+      color: #fff !important;  // 默认白色
       background-color: #1f2d3d !important;
 
       &:hover {
-        color: #ffd04b !important;
+        color: #ffd04b !important;  // 悬停黄色
         background-color: #263445 !important;
       }
 
       &.is-active {
-        color: #ffd04b !important;
+        color: #ffd04b !important;  // 激活黄色
       }
     }
   }
@@ -473,16 +473,16 @@
     border: none !important;
 
     .el-menu-item {
-      color: #ffd04b !important;
+      color: #fff !important;  // 默认白色
       background-color: #1f2d3d !important;
 
       &:hover {
-        color: #ffd04b !important;
+        color: #ffd04b !important;  // 悬停黄色
         background-color: #263445 !important;
       }
 
       &.is-active {
-        color: #ffd04b !important;
+        color: #ffd04b !important;  // 激活黄色
       }
     }
 

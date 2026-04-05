@@ -146,15 +146,15 @@ const savePath = (path) => {
       // 修复弹出式子菜单的颜色问题
       .el-menu--popup {
         .el-menu-item {
-          color: #ffd04b !important;
+          color: #fff !important;  // 默认白色
 
           &:hover {
-            color: #ffd04b !important;
+            color: #ffd04b !important;  // 悬停时黄色
             background-color: #263445 !important;
           }
 
           &.is-active {
-            color: #ffd04b !important;
+            color: #ffd04b !important;  // 激活状态黄色
           }
         }
       }
