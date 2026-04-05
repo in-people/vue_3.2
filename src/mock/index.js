@@ -238,27 +238,86 @@ Mock.mock(/\/api\/roles/, 'get', () => {
 // 模拟商品列表
 Mock.mock(/\/api\/goods(\?.*)?$/, 'get', () => {
   const goods = []
-  for (let i = 1; i <= 12; i++) {
+  const brands = ['Apple', '华为', '小米', 'OPPO', 'vivo', '三星', '联想', '戴尔', '索尼', 'LG']
+  const categories = ['手机', '电脑', '平板', '耳机', '音响', '相机', '键盘', '鼠标', '充电器', '数据线']
+
+  for (let i = 1; i <= 50; i++) {
+    const brand = brands[Mock.Random.integer(0, brands.length - 1)]
+    const category = categories[Mock.Random.integer(0, categories.length - 1)]
     goods.push(
       Mock.mock({
-        id: String(i + 1000),
-        goods_name: '@ctitle(5,15)',
-        goods_price: '@integer(10,9999)',
-        goods_number: '@integer(1,1000)',
-        goods_weight: '@integer(100,5000)',
-        goods_state: i % 3 === 0 ? 0 : 1,
-        add_time: Date.now() - Mock.Random.integer(1, 30) * 24 * 60 * 60 * 1000,
-        upd_time: Date.now(),
-        hot_mumber: '@integer(0,999)',
-        is_promote: '@boolean'
+        goods_id: String(i + 1000),
+        goods_name: brand + category + ' ' + Mock.Random.pick(['Pro', 'Max', 'Ultra', 'Plus', 'Lite', '标准版', '旗舰版']),
+        goods_price: Mock.Random.integer(100, 19999),
+        goods_number: Mock.Random.integer(0, 2000),
+        goods_weight: Mock.Random.integer(100, 5000),
+        goods_state: Mock.Random.integer(0, 1), // 0: 未审核, 1: 已审核
+        add_time: Date.now() - Mock.Random.integer(1, 180) * 24 * 60 * 60 * 1000,
+        upd_time: Date.now() - Mock.Random.integer(0, 30) * 24 * 60 * 60 * 1000,
+        hot_mumber: Mock.Random.integer(0, 2000),
+        is_promote: Mock.Random.boolean(),
+        goods_cat: '1,' + Mock.Random.integer(1, 10) + ',' + Mock.Random.integer(1, 20)
       })
     )
   }
 
   return successResponse({
-    total: 12,
+    total: 50,
     pagenum: 1,
     goods
+  })
+})
+
+// 模拟商品详情查询
+Mock.mock(/\/api\/goods\/\d+$/, 'get', (options) => {
+  const id = options.url.match(/\/api\/goods\/(\d+)$/)[1]
+  return successResponse({
+    goods_id: id,
+    goods_name: Mock.Random.ctitle(5, 15),
+    goods_price: Mock.Random.integer(100, 9999),
+    goods_number: Mock.Random.integer(1, 1000),
+    goods_weight: Mock.Random.integer(100, 5000),
+    goods_state: 1,
+    add_time: Date.now() - Mock.Random.integer(1, 30) * 24 * 60 * 60 * 1000,
+    upd_time: Date.now(),
+    hot_mumber: Mock.Random.integer(0, 999),
+    is_promote: Mock.Random.boolean(),
+    goods_cat: '1,5,12',
+    pics: [
+      { pics_id: '1', pics_big: 'http://example.com/pic1.jpg', pics_mid: 'http://example.com/pic1_mid.jpg', pics_sma: 'http://example.com/pic1_sma.jpg' }
+    ],
+    attrs: [
+      { attr_id: '1', attr_value: '黑色', attr_name: '颜色' },
+      { attr_id: '2', attr_value: '128GB', attr_name: '容量' }
+    ]
+  })
+})
+
+// 模拟添加商品
+Mock.mock(/\/api\/goods$/, 'post', () => {
+  return successResponse({
+    message: '添加商品成功'
+  })
+})
+
+// 模拟编辑商品
+Mock.mock(/\/api\/goods\/\d+$/, 'put', () => {
+  return successResponse({
+    message: '更新商品成功'
+  })
+})
+
+// 模拟删除商品
+Mock.mock(/\/api\/goods\/\d+$/, 'delete', () => {
+  return successResponse({
+    message: '删除商品成功'
+  })
+})
+
+// 模拟商品状态修改
+Mock.mock(/\/api\/goods\/\d+\/state\/\d+$/, 'put', () => {
+  return successResponse({
+    message: '状态修改成功'
   })
 })
 
