@@ -1,0 +1,499 @@
+// 全局样式修复 - 确保文字在深色背景下清晰可见
+
+// 覆盖 Element Plus 的默认样式 - 侧边栏背景色
+.sidebar-container {
+  background-color: #304156 !important;
+  color: #fff !important;
+}
+
+.app-wrapper {
+  .sidebar-container {
+    background-color: #304156 !important;
+  }
+}
+
+// 确保汉堡按钮可见和可点击
+.hamburger-container {
+  font-size: 24px !important;
+  color: #303133 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 8px !important;
+  height: 60px !important;
+  min-width: 40px !important;
+  position: relative !important;
+  z-index: 10 !important;
+
+  &:hover {
+    color: #409EFF !important;
+    background-color: rgba(64, 158, 255, 0.1) !important;
+  }
+
+  .svg-icon {
+    width: 1em !important;
+    height: 1em !important;
+    display: block !important;
+    fill: currentColor !important;
+  }
+}
+
+// 修复侧边栏菜单的颜色问题
+.sidebar-container {
+  background-color: #304156 !important;
+  width: 200px !important;
+
+  .el-menu {
+    background-color: #304156 !important;
+    border: none !important;
+    width: 200px !important;
+
+    .el-sub-menu__title {
+      color: #fff !important;
+      background-color: #304156 !important;
+      height: 56px;
+      line-height: 56px;
+
+      &:hover {
+        color: #ffd04b !important;
+        background-color: #263445 !important;
+      }
+    }
+
+    .el-menu-item {
+      color: #fff !important;
+      background-color: #1f2d3d !important;
+      height: 56px;
+      line-height: 56px;
+
+      &:hover {
+        color: #ffd04b !important;
+        background-color: #263445 !important;
+      }
+
+      &.is-active {
+        color: #ffd04b !important;
+        background-color: #1f2d3d !important;
+      }
+    }
+
+    // 嵌套菜单样式
+    .el-menu--inline {
+      background-color: #1f2d3d !important;
+
+      .el-menu-item {
+        color: #fff !important;
+        padding-left: 45px !important;
+        background-color: #1f2d3d !important;
+
+        &:hover {
+          color: #ffd04b !important;
+          background-color: #263445 !important;
+        }
+
+        &.is-active {
+          color: #ffd04b !important;
+        }
+      }
+    }
+  }
+
+  // SVG 图标颜色
+  .svg-container {
+    color: #fff !important;
+  }
+}
+
+// 修复弹出式菜单（收起状态下的子菜单）
+.el-menu--vertical { // 垂直菜单
+  &.el-menu--popup { // 弹出式菜单
+    background-color: #1f2d3d !important;
+    min-width: 200px !important;
+    border: none !important;
+
+    .el-menu-item {  // 菜单项
+      color: #fff !important;
+      background-color: #1f2d3d !important;
+      height: 56px;
+      line-height: 56px;
+
+      &:hover {  // 悬停状态
+        color: #ffd04b !important;
+        background-color: #263445 !important;
+      }
+
+      &.is-active {  // 激活状态
+        color: #ffd04b !important;
+      }
+    }
+  }
+}
+
+// 收起状态的侧边栏
+.hideSidebar {
+  .el-aside {
+    width: 64px !important;
+  }
+
+  .sidebar-container {
+    width: 64px !important;
+
+    .el-menu {
+      width: 64px !important;
+
+      .el-sub-menu__title {
+        padding: 0 22px !important;
+        text-align: center;
+
+        span {
+          display: none !important;
+        }
+
+        .el-sub-menu__icon-arrow {
+          display: none !important;
+        }
+
+        .el-icon {
+          margin-right: 0 !important;
+        }
+      }
+
+      .el-menu-item {
+        padding: 0 22px !important;
+        text-align: center;
+
+        span {
+          display: none !important;
+        }
+
+        .el-icon {
+          margin-right: 0 !important;
+        }
+      }
+    }
+  }
+
+  // 修复弹出式子菜单的颜色
+  .el-menu--popup {
+    background-color: #1f2d3d !important;
+    min-width: 200px !important;
+
+    .el-menu-item {
+      color: #fff !important;
+      background-color: #1f2d3d !important;
+
+      &:hover {
+        color: #ffd04b !important;
+        background-color: #263445 !important;
+      }
+
+      &.is-active {
+        color: #ffd04b !important;
+      }
+    }
+  }
+
+  .container {
+    width: calc(100% - 64px) !important;
+  }
+}
+
+// 确保 el-aside 有正确的背景色
+.el-aside {
+  background-color: #304156 !important;
+}
+
+// 修复 Element Plus 组件在深色主题下的文字颜色
+.el-container {
+  color: #333;
+}
+
+.el-main {
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.el-header {
+  background-color: #fff;
+  color: #333;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+// 确保表格文字清晰可见
+.el-table {
+  color: #333;
+  background-color: #fff;
+
+  .el-table__header {
+    th {
+      background-color: #f5f7fa;
+      color: #333;
+    }
+  }
+
+  .el-table__body {
+    td {
+      color: #333;
+    }
+  }
+}
+
+// 确保卡片文字清晰可见
+.el-card {
+  color: #333;
+  background-color: #fff;
+}
+
+// 确保按钮文字清晰可见
+.el-button {
+  &.el-button--default {
+    color: #333;
+    background-color: #fff;
+    border-color: #dcdfe6;
+  }
+
+  &.el-button--primary {
+    color: #fff;
+  }
+
+  &.el-button--success {
+    color: #fff;
+  }
+
+  &.el-button--warning {
+    color: #fff;
+  }
+
+  &.el-button--danger {
+    color: #fff;
+  }
+
+  &.el-button--info {
+    color: #fff;
+  }
+}
+
+// 确保表单文字清晰可见
+.el-form {
+  color: #333;
+
+  .el-form-item__label {
+    color: #333;
+  }
+}
+
+.el-input {
+  .el-input__inner {
+    color: #333;
+    background-color: #fff;
+    border-color: #dcdfe6;
+  }
+}
+
+// 确保对话框文字清晰可见
+.el-dialog {
+  .el-dialog__header {
+    color: #333;
+  }
+
+  .el-dialog__body {
+    color: #333;
+  }
+}
+
+// 确保消息提示文字清晰可见
+.el-message {
+  color: #333;
+}
+
+// 确保下拉菜单文字清晰可见
+.el-select-dropdown {
+  .el-select-dropdown__item {
+    color: #333;
+  }
+}
+
+.el-dropdown-menu {
+  .el-dropdown-menu__item {
+    color: #333;
+  }
+}
+
+// 确保分页组件文字清晰可见
+.el-pagination {
+  color: #333;
+
+  .el-pager li {
+    color: #333;
+  }
+
+  .btn-prev,
+  .btn-next {
+    color: #333;
+  }
+}
+
+// 确保标签页文字清晰可见
+.el-tabs {
+  .el-tabs__item {
+    color: #333;
+  }
+}
+
+// 确保面包屑文字清晰可见
+.el-breadcrumb {
+  .el-breadcrumb__item {
+    .el-breadcrumb__inner {
+      color: #333;
+    }
+  }
+}
+
+// 确保标签文字清晰可见
+.el-tag {
+  color: #333;
+}
+
+// 确保树形控件文字清晰可见
+.el-tree {
+  .el-tree-node__content {
+    color: #333;
+  }
+}
+
+// 确保开关组件清晰可见
+.el-switch {
+  &.is-checked {
+    .el-switch__core {
+      background-color: #409eff;
+      border-color: #409eff;
+    }
+  }
+}
+
+// 确保复选框和单选框文字清晰可见
+.el-checkbox {
+  color: #333;
+}
+
+.el-radio {
+  color: #333;
+}
+
+// 确保日期选择器文字清晰可见
+.el-date-picker {
+  color: #333;
+}
+
+// 确保时间选择器文字清晰可见
+.el-time-picker {
+  color: #333;
+}
+
+// 确保颜色选择器文字清晰可见
+.el-color-picker {
+  color: #333;
+}
+
+// 确保数字输入框文字清晰可见
+.el-input-number {
+  .el-input__inner {
+    color: #333;
+  }
+}
+
+// 确保滑块文字清晰可见
+.el-slider {
+  .el-slider__button {
+    border-color: #409eff;
+  }
+}
+
+// 确保进度条文字清晰可见
+.el-progress {
+  .el-progress__text {
+    color: #333;
+  }
+}
+
+// 确保加载文字清晰可见
+.el-loading {
+  .el-loading-text {
+    color: #333;
+  }
+}
+
+// 确保通知文字清晰可见
+.el-notification {
+  color: #333;
+}
+
+// 确保Popper文字清晰可见
+.el-popper {
+  color: #333;
+}
+
+// 确保Tooltip文字清晰可见
+.el-tooltip__popper {
+  color: #333;
+}
+
+// 确保Alert文字清晰可见
+.el-alert {
+  color: #333;
+}
+
+// 确保Steps文字清晰可见
+.el-steps {
+  .el-step__title {
+    color: #333;
+  }
+}
+
+// 确保Menu文字清晰可见（主内容区域的菜单）
+.el-menu {
+  &.el-menu--horizontal {
+    .el-menu-item {
+      color: #333;
+    }
+
+    .el-submenu__title {
+      color: #333;
+    }
+  }
+}
+
+// 全局修复弹出式菜单的颜色
+.el-menu--vertical {
+  &.el-menu--popup,
+  .el-menu--popup {
+    background-color: #1f2d3d !important;
+    min-width: 200px !important;
+    border: none !important;
+
+    .el-menu-item {
+      color: #ffd04b !important;
+      background-color: #1f2d3d !important;
+
+      &:hover {
+        color: #ffd04b !important;
+        background-color: #263445 !important;
+      }
+
+      &.is-active {
+        color: #ffd04b !important;
+      }
+    }
+
+    .el-sub-menu__title {
+      color: #fff !important;
+      background-color: #1f2d3d !important;
+
+      &:hover {
+        color: #ffd04b !important;
+        background-color: #263445 !important;
+      }
+    }
+  }
+}

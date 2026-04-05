@@ -92,10 +92,22 @@ $cursor: #fff;
     overflow: hidden;
 
     ::v-deep .el-form-item {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
       border-radius: 5px;
-      color: #454545;
+      color: #fff;
+      margin-bottom: 22px;
+      transition: all 0.3s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &.is-error {
+        background: rgba(255, 87, 87, 0.1);
+        border-color: #f56c6c;
+      }
     }
 
     ::v-deep .el-input {
@@ -109,14 +121,34 @@ $cursor: #fff;
         -webkit-appearance: none;
         border-radius: 0px;
         padding: 12px 5px 12px 15px;
-        color: $light_gray;
+        color: #fff;
         height: 47px;
-        caret-color: $cursor;
+        caret-color: #409EFF;
+        font-size: 16px;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        &:focus {
+          background: transparent;
+          outline: none;
+        }
+      }
+
+      .el-input__wrapper {
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
       }
     }
+
     .login-button {
       width: 100%;
       box-sizing: border-box;
+      margin-top: 20px;
+      height: 47px;
+      font-size: 16px;
     }
   }
 

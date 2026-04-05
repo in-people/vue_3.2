@@ -9,6 +9,11 @@ import '@/router/permission'
 import * as ELIcons from '@element-plus/icons-vue'
 import i18n from '@/i18n'
 
+// 开发环境引入 Mock 数据
+if (process.env.NODE_ENV === 'development') {
+  require('@/mock')
+}
+
 const app = createApp(App)
 for (const iconName in ELIcons) {
   app.component(iconName, ELIcons[iconName])

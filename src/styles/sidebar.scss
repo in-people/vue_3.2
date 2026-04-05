@@ -8,7 +8,6 @@
 
   .sidebar-container {
     transition: width #{$sideBarDuration};
-    // width: $sideBarWidth !important;
     height: 100%;
     position: fixed;
     top: 0;
@@ -16,7 +15,7 @@
     left: 0;
     z-index: 1001;
     overflow: hidden;
-    background-color: $menuBg;
+    background-color: $menuBg !important;
     // 重置 element-plus 的css
     .horizontal-collapse-transition {
       transition: 0s width ease-in-out, 0s padding-left ease-in-out,
@@ -78,11 +77,15 @@
 
   .hideSidebar {
     .sidebar-container {
-      width: 54px !important;
+      width: 64px !important;
+
+      .el-menu {
+        width: 64px !important;
+      }
     }
 
     .main-container {
-      margin-left: 54px;
+      margin-left: 64px;
     }
 
     .submenu-title-noDropdown {
@@ -119,6 +122,30 @@
         .el-submenu__icon-arrow {
           display: none;
         }
+
+        span {
+          display: none;
+        }
+      }
+
+      // 修复收起状态下弹出式子菜单的颜色
+      .el-menu--popup {
+        background-color: #1f2d3d !important;
+        min-width: 200px !important;
+
+        .el-menu-item {
+          color: #ffd04b !important;
+          background-color: #1f2d3d !important;
+
+          &:hover {
+            color: #ffd04b !important;
+            background-color: #263445 !important;
+          }
+
+          &.is-active {
+            color: #ffd04b !important;
+          }
+        }
       }
     }
 
@@ -132,6 +159,26 @@
             visibility: hidden;
             display: inline-block;
           }
+        }
+      }
+    }
+
+    // 修复弹出式菜单样式
+    .el-menu--popup {
+      background-color: #1f2d3d !important;
+      min-width: 200px !important;
+
+      .el-menu-item {
+        color: #ffd04b !important;
+        background-color: #1f2d3d !important;
+
+        &:hover {
+          color: #ffd04b !important;
+          background-color: #263445 !important;
+        }
+
+        &.is-active {
+          color: #ffd04b !important;
         }
       }
     }

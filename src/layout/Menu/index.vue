@@ -57,4 +57,123 @@ const savePath = (path) => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.el-menu-vertical-demo {
+  border-right: none;
+  height: 100%;
+  background-color: #304156 !important;
+  width: 100% !important;
+}
+
+:deep(.el-sub-menu) {
+  .el-sub-menu__title {
+    color: #fff !important;
+    font-size: 14px;
+    transition: all 0.3s;
+    background-color: #304156 !important;
+    height: 56px;
+    line-height: 56px;
+    padding: 0 20px !important;
+
+    &:hover {
+      background-color: #263445 !important;
+      color: #ffd04b !important;
+    }
+
+    .el-sub-menu__icon-arrow {
+      color: #fff !important;
+    }
+
+    .el-icon {
+      width: 18px;
+      margin-right: 8px;
+    }
+  }
+
+  .el-menu {
+    background-color: #1f2d3d !important;
+
+    .el-menu-item {
+      color: #fff !important;
+      font-size: 14px;
+      transition: all 0.3s;
+      background-color: #1f2d3d !important;
+      padding-left: 45px !important;
+      height: 56px;
+      line-height: 56px;
+
+      &:hover {
+        background-color: #263445 !important;
+        color: #ffd04b !important;
+      }
+
+      &.is-active {
+        color: #ffd04b !important;
+        background-color: #1f2d3d !important;
+      }
+
+      .el-icon {
+        width: 14px;
+        margin-right: 6px;
+      }
+    }
+  }
+}
+
+// 收起状态样式
+.hideSidebar {
+  .el-menu-vertical-demo {
+    width: 64px !important;
+
+    :deep(.el-sub-menu) {
+      .el-sub-menu__title {
+        padding: 0 20px !important;
+
+        span {
+          display: none;
+        }
+
+        .el-sub-menu__icon-arrow {
+          display: none;
+        }
+
+        .el-icon {
+          margin-right: 0;
+          width: 20px;
+        }
+      }
+
+      // 修复弹出式子菜单的颜色问题
+      .el-menu--popup {
+        .el-menu-item {
+          color: #ffd04b !important;
+
+          &:hover {
+            color: #ffd04b !important;
+            background-color: #263445 !important;
+          }
+
+          &.is-active {
+            color: #ffd04b !important;
+          }
+        }
+      }
+
+      .el-menu {
+        .el-menu-item {
+          padding: 0 20px !important;
+
+          span {
+            display: none;
+          }
+
+          .el-icon {
+            margin-right: 0;
+            width: 20px;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

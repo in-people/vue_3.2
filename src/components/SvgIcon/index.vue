@@ -25,5 +25,14 @@ const iconName = computed(() => {
   vertical-align: -0.15em;
   fill: currentColor;
   overflow: hidden;
+  display: inline-block;
+}
+
+// 全局 SVG 图标样式
+:global(.svg-icon) {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  fill: currentColor;
 }
 </style>
