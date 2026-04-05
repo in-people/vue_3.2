@@ -10,7 +10,7 @@
           <span>用户管理</span>
           <!-- 主要操作按钮：用于打开添加用户的对话框 -->
           <!-- 卡片右上角的按钮 -->
-          <el-button type="primary" size="small">添加用户</el-button>
+          <el-button type="primary" size="small" @click="handleAddDialog">添加用户</el-button>
         </div>
       </template>
 
@@ -100,6 +100,48 @@
         </template>
       </el-dialog>
 
+      <!-- 添加用户对话框：包含用户信息添加表单 -->
+      <el-dialog
+        v-model="addDialogVisible"
+        title="添加用户"
+        width="500px"
+        @close="handleAddDialogClose"
+      >
+        <!-- 表单组件：包含添加用户所需的所有字段 -->
+        <el-form
+          ref="addFormRef"
+          :model="addForm"
+          :rules="addFormRules"
+          label-width="80px"
+        >
+          <!-- 用户名：必填字段 -->
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="addForm.username" placeholder="请输入用户名" />
+          </el-form-item>
+          <!-- 邮箱：必填字段，需要验证格式 -->
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="addForm.email" placeholder="请输入邮箱" />
+          </el-form-item>
+          <!-- 手机号：必填字段，需要验证格式 -->
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="addForm.mobile" placeholder="请输入手机号" />
+          </el-form-item>
+          <!-- 角色：下拉选择框 -->
+          <el-form-item label="角色" prop="role_name">
+            <el-select v-model="addForm.role_name" placeholder="请选择角色" style="width: 100%">
+              <el-option label="超级管理员" value="超级管理员" />
+              <el-option label="管理员" value="管理员" />
+              <el-option label="普通用户" value="普通用户" />
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <!-- 对话框底部按钮 -->
+        <template #footer>
+          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleAddSubmit">确定</el-button>
+        </template>
+      </el-dialog>
+
       <!-- 分页组件：处理大量用户数据的分页展示 -->
       <div class="pagination-container">
         <el-pagination
@@ -122,7 +164,7 @@ import { ref, onMounted } from 'vue'
 // 导入 Element Plus 的消息提示和弹窗组件
 import { ElMessage, ElMessageBox } from 'element-plus'
 // 导入用户相关的 API 方法
-import { getUsersList, deleteUser, updateUserState, updateUser, getUserById } from '@/api/users'
+import { getUsersList, deleteUser, updateUserState, updateUser, getUserById, addUser } from '@/api/users'
 
 // 定义响应式数据变量
 // 搜索关键词，双向绑定到搜索输入框，初始为空字符串
@@ -158,6 +200,42 @@ const editFormRules = {
     { type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] }
   ],
   // 手机号验证规则（放宽：只需 11 位数字）
+  mobile: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^\d{11}$/, message: '请输入 11 位手机号码', trigger: ['blur', 'change'] }
+  ],
+  // 角色验证规则
+  role_name: [
+    { required: true, message: '请选择角色', trigger: 'change' }
+  ]
+}
+
+// 添加用户对话框相关数据
+// 控制添加用户对话框的显示与隐藏
+const addDialogVisible = ref(false)
+// 添加表单的引用，用于表单验证
+const addFormRef = ref(null)
+// 添加表单的数据对象
+const addForm = ref({
+  username: '',
+  email: '',
+  mobile: '',
+  role_name: ''
+})
+
+// 添加表单验证规则
+const addFormRules = {
+  // 用户名验证规则
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 2, max: 20, message: '用户名长度在 2 到 20 个字符', trigger: ['blur', 'change'] }
+  ],
+  // 邮箱验证规则
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] }
+  ],
+  // 手机号验证规则
   mobile: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^\d{11}$/, message: '请输入 11 位手机号码', trigger: ['blur', 'change'] }
@@ -320,6 +398,66 @@ const handleDialogClose = () => {
   // 清空表单数据
   editForm.value = {
     id: '',
+    username: '',
+    email: '',
+    mobile: '',
+    role_name: ''
+  }
+}
+
+/**
+ * 处理打开添加用户对话框
+ * 清空表单并显示对话框
+ */
+const handleAddDialog = () => {
+  // 清空表单数据
+  addForm.value = {
+    username: '',
+    email: '',
+    mobile: '',
+    role_name: ''
+  }
+  // 打开对话框
+  addDialogVisible.value = true
+}
+
+/**
+ * 处理添加用户表单提交
+ * 验证表单后调用 API 添加用户
+ */
+const handleAddSubmit = async () => {
+  try {
+    // 验证表单
+    await addFormRef.value.validate()
+
+    // 调用 API 添加用户
+    await addUser(addForm.value)
+
+    // 显示成功提示
+    ElMessage.success('用户添加成功')
+
+    // 关闭对话框
+    addDialogVisible.value = false
+
+    // 重新获取用户列表数据
+    await fetchUsersList()
+  } catch (error) {
+    // 表单验证失败或添加失败
+    if (error !== false) {
+      ElMessage.error('添加失败：' + error.message)
+    }
+  }
+}
+
+/**
+ * 处理添加对话框关闭事件
+ * 重置表单状态
+ */
+const handleAddDialogClose = () => {
+  // 重置表单验证状态
+  addFormRef.value?.resetFields()
+  // 清空表单数据
+  addForm.value = {
     username: '',
     email: '',
     mobile: '',

@@ -213,6 +213,33 @@ Mock.mock(/\/api\/users\/\d+$/, 'get', (options) => {
   }
 })
 
+// 模拟添加用户
+Mock.mock(/\/api\/users$/, 'post', (options) => {
+  const body = JSON.parse(options.body)
+
+  // 生成新的用户ID（当前最大ID + 1）
+  const maxId = Math.max(...cachedUsersList.map(u => parseInt(u.id)))
+  const newId = String(maxId + 1)
+
+  // 创建新用户对象
+  const newUser = {
+    id: newId,
+    username: body.username,
+    email: body.email,
+    mobile: body.mobile,
+    role_name: body.role_name,
+    mg_state: true // 默认启用
+  }
+
+  // 添加到缓存列表的开头
+  cachedUsersList.unshift(newUser)
+
+  return successResponse({
+    ...newUser,
+    message: '用户添加成功'
+  })
+})
+
 // 模拟用户编辑
 Mock.mock(/\/api\/users\/\d+$/, 'put', (options) => {
   const id = options.url.match(/\/api\/users\/(\d+)$/)[1]
