@@ -132,32 +132,132 @@ Mock.mock(/\/api\/menus/, 'get', () => {
   ])
 })
 
+// 缓存用户数据，确保每次请求返回相同的数据
+const cachedUsersList = (() => {
+  const users = [
+    { id: '1001', username: '张三', email: 'zhangsan@example.com', mobile: '13800138001', role_name: '超级管理员', mg_state: true },
+    { id: '1002', username: '李四', email: 'lisi@example.com', mobile: '13800138002', role_name: '管理员', mg_state: true },
+    { id: '1003', username: '王五', email: 'wangwu@example.com', mobile: '13800138003', role_name: '普通用户', mg_state: false },
+    { id: '1004', username: '赵六', email: 'zhaoliu@example.com', mobile: '13800138004', role_name: '普通用户', mg_state: true },
+    { id: '1005', username: '钱七', email: 'qianqi@example.com', mobile: '13800138005', role_name: '管理员', mg_state: true },
+    { id: '1006', username: '孙八', email: 'sunba@example.com', mobile: '13800138006', role_name: '普通用户', mg_state: true },
+    { id: '1007', username: '周九', email: 'zhoujiu@example.com', mobile: '13800138007', role_name: '超级管理员', mg_state: false },
+    { id: '1008', username: '吴十', email: 'wushi@example.com', mobile: '13800138008', role_name: '普通用户', mg_state: true },
+    { id: '1009', username: '郑十一', email: 'zhengshiyi@example.com', mobile: '13800138009', role_name: '管理员', mg_state: true },
+    { id: '1010', username: '王十二', email: 'wangshier@example.com', mobile: '13800138010', role_name: '普通用户', mg_state: true },
+    { id: '1011', username: '冯小明', email: 'fengxiaoming@example.com', mobile: '13800138011', role_name: '管理员', mg_state: false },
+    { id: '1012', username: '陈小红', email: 'chenxiaohong@example.com', mobile: '13800138012', role_name: '普通用户', mg_state: true },
+    { id: '1013', username: '褚小刚', email: 'chuxiaogang@example.com', mobile: '13800138013', role_name: '超级管理员', mg_state: true },
+    { id: '1014', username: '卫小丽', email: 'weixiaoli@example.com', mobile: '13800138014', role_name: '普通用户', mg_state: true },
+    { id: '1015', username: '蒋小华', email: 'jiangxiaohua@example.com', mobile: '13800138015', role_name: '管理员', mg_state: false },
+    { id: '1016', username: '沈小龙', email: 'shenxiaolong@example.com', mobile: '13800138016', role_name: '普通用户', mg_state: true },
+    { id: '1017', username: '韩小燕', email: 'hanxiaoyan@example.com', mobile: '13800138017', role_name: '管理员', mg_state: true },
+    { id: '1018', username: '杨小军', email: 'yangxiaojun@example.com', mobile: '13800138018', role_name: '普通用户', mg_state: true },
+    { id: '1019', username: '朱小梅', email: 'zhuxiaomei@example.com', mobile: '13800138019', role_name: '超级管理员', mg_state: false },
+    { id: '1020', username: '秦小强', email: 'qinxiaoqiang@example.com', mobile: '13800138020', role_name: '普通用户', mg_state: true },
+    { id: '1021', username: '尤小芳', email: 'youxiaofang@example.com', mobile: '13800138021', role_name: '管理员', mg_state: true },
+    { id: '1022', username: '许小杰', email: 'xuxiaojie@example.com', mobile: '13800138022', role_name: '普通用户', mg_state: true },
+    { id: '1023', username: '何小娜', email: 'hexiaona@example.com', mobile: '13800138023', role_name: '管理员', mg_state: false },
+    { id: '1024', username: '吕小涛', email: 'luxiaotao@example.com', mobile: '13800138024', role_name: '普通用户', mg_state: true },
+    { id: '1025', username: '施小磊', email: 'shixiaolei@example.com', mobile: '13800138025', role_name: '超级管理员', mg_state: true },
+    { id: '1026', username: '张小伟', email: 'zhangxiaowei@example.com', mobile: '13800138026', role_name: '普通用户', mg_state: true },
+    { id: '1027', username: '孔小静', email: 'kongxiaojing@example.com', mobile: '13800138027', role_name: '管理员', mg_state: false },
+    { id: '1028', username: '曹小敏', email: 'caoxiaomin@example.com', mobile: '13800138028', role_name: '普通用户', mg_state: true },
+    { id: '1029', username: '严小波', email: 'yanxiaobo@example.com', mobile: '13800138029', role_name: '管理员', mg_state: true },
+    { id: '1030', username: '华小婷', email: 'huaxiaoting@example.com', mobile: '13800138030', role_name: '普通用户', mg_state: true }
+  ]
+  return users
+})()
+
 // 模拟用户列表接口
-Mock.mock(/\/api\/users(\?.*)?$/, 'get', () => {
-  const userList = []
-  for (let i = 1; i <= 15; i++) {
-    userList.push(
-      Mock.mock({
-        id: String(i + 1000),
-        username: '@cname',
-        email: '@email',
-        mobile: /^1[3-9]\d{9}$/,
-        role_name: i % 3 === 0 ? '超级管理员' : (i % 2 === 0 ? '管理员' : '普通用户'),
-        mg_state: '@boolean'
-      })
+Mock.mock(/\/api\/users(\?.*)?$/, 'get', (options) => {
+  // 解析查询参数
+  const url = new URL(options.url, 'http://localhost')
+  const query = url.searchParams.get('query') || ''
+  const pagenum = parseInt(url.searchParams.get('pagenum')) || 1
+  const pagesize = parseInt(url.searchParams.get('pagesize')) || 10
+
+  // 根据查询条件过滤用户
+  let filteredUsers = cachedUsersList
+  if (query) {
+    filteredUsers = cachedUsersList.filter(user =>
+      user.username.includes(query) ||
+      user.mobile.includes(query) ||
+      user.email.includes(query)
     )
   }
 
+  // 计算分页数据
+  const total = filteredUsers.length
+  const startIndex = (pagenum - 1) * pagesize
+  const endIndex = startIndex + pagesize
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
+
   return successResponse({
-    total: 15,
-    pagenum: 1,
-    users: userList
+    total,
+    pagenum,
+    users: paginatedUsers
   })
 })
 
+// 模拟用户详情查询
+Mock.mock(/\/api\/users\/\d+$/, 'get', (options) => {
+  const id = options.url.match(/\/api\/users\/(\d+)$/)[1]
+  // 从缓存列表中查找对应的用户数据
+  const user = cachedUsersList.find(u => u.id === id)
+
+  if (user) {
+    return successResponse(user)
+  } else {
+    return errorResponse('用户不存在')
+  }
+})
+
+// 模拟用户编辑
+Mock.mock(/\/api\/users\/\d+$/, 'put', (options) => {
+  const id = options.url.match(/\/api\/users\/(\d+)$/)[1]
+  const body = JSON.parse(options.body)
+
+  // 从缓存列表中查找对应的用户索引
+  const userIndex = cachedUsersList.findIndex(u => u.id === id)
+
+  if (userIndex !== -1) {
+    // 更新缓存中的用户数据
+    cachedUsersList[userIndex] = {
+      ...cachedUsersList[userIndex],
+      email: body.email,
+      mobile: body.mobile,
+      role_name: body.role_name
+    }
+
+    return successResponse({
+      ...cachedUsersList[userIndex],
+      message: '用户更新成功'
+    })
+  } else {
+    return errorResponse('用户不存在')
+  }
+})
+
 // 模拟用户状态修改
-Mock.mock(/\/api\/users\/\d+\/state\/\w+/, 'put', () => {
-  return successResponse({ msg: '状态修改成功' })
+Mock.mock(/\/api\/users\/\d+\/state\/(true|false)/, 'put', (options) => {
+  const matches = options.url.match(/\/api\/users\/(\d+)\/state\/(true|false)/)
+  const id = matches[1]
+  const state = matches[2] === 'true'
+
+  // 从缓存列表中查找对应的用户索引
+  const userIndex = cachedUsersList.findIndex(u => u.id === id)
+
+  if (userIndex !== -1) {
+    // 更新缓存中的用户状态
+    cachedUsersList[userIndex].mg_state = state
+
+    return successResponse({
+      message: '状态修改成功'
+    })
+  } else {
+    return errorResponse('用户不存在')
+  }
 })
 
 // 模拟用户添加
@@ -178,8 +278,22 @@ Mock.mock(/\/api\/users\/\d+/, 'put', () => {
 })
 
 // 模拟用户删除
-Mock.mock(/\/api\/users\/\d+/, 'delete', () => {
-  return successResponse({ msg: '用户删除成功' })
+Mock.mock(/\/api\/users\/\d+$/, 'delete', (options) => {
+  const id = options.url.match(/\/api\/users\/(\d+)$/)[1]
+
+  // 从缓存列表中查找对应的用户索引
+  const userIndex = cachedUsersList.findIndex(u => u.id === id)
+
+  if (userIndex !== -1) {
+    // 从缓存中删除用户
+    cachedUsersList.splice(userIndex, 1)
+
+    return successResponse({
+      message: '用户删除成功'
+    })
+  } else {
+    return errorResponse('用户不存在')
+  }
 })
 
 // 模拟权限列表

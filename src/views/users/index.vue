@@ -4,10 +4,12 @@
     <!-- 卡片容器：白色背景卡片，包含所有用户管理功能 -->
     <el-card class="box-card">
       <!-- 卡片头部：左侧显示标题，右侧放置操作按钮 -->
+      <!-- 替换默认头部 -->
       <template #header>
         <div class="card-header">
           <span>用户管理</span>
           <!-- 主要操作按钮：用于打开添加用户的对话框 -->
+          <!-- 卡片右上角的按钮 -->
           <el-button type="primary" size="small">添加用户</el-button>
         </div>
       </template>
@@ -22,7 +24,7 @@
           class="filter-item"
         />
         <!-- 搜索按钮：点击触发搜索操作 -->
-        <el-button type="primary" class="filter-item">搜索</el-button>
+        <el-button type="primary" class="filter-item" @click="handleSearch">搜索</el-button>
       </div>
 
       <!-- 用户数据表格：展示用户列表信息 -->
@@ -40,30 +42,74 @@
         <!-- 表格列：用户启用/禁用状态 -->
         <el-table-column prop="mg_state" label="状态" width="80">
           <template #default="scope">
-            <!-- 状态开关：v-model 双向绑定，即时生效 -->
+            <!-- 状态开关：v-model 双向绑定，change 事件触发状态更新 -->
             <!-- scope.row 获取当前行数据 -->
-            <el-switch v-model="scope.row.mg_state" />
+            <el-switch v-model="scope.row.mg_state" @change="handleStateChange(scope.row)" />
           </template>
         </el-table-column>
         <!-- 表格列：操作按钮列 -->
         <el-table-column label="操作" width="200">
-          <template #default>
+          <template #default="scope">
             <!-- 编辑按钮：主要样式，用于修改用户信息 -->
-            <el-button type="primary" size="small">编辑</el-button>
+            <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
             <!-- 删除按钮：危险样式，用于移除用户 -->
-            <el-button type="danger" size="small">删除</el-button>
+            <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
 
+      <!-- 编辑用户的弹窗(对话框)：包含用户信息编辑表单 -->
+      <el-dialog
+        v-model="editDialogVisible"
+        title="编辑用户"
+        width="500px"
+        @close="handleDialogClose"
+      >
+        <!-- 表单组件：包含编辑用户所需的所有字段 -->
+        <el-form
+          ref="editFormRef"
+          :model="editForm"
+          :rules="editFormRules"
+          label-width="80px"
+        >
+          <!-- 用户名：只读字段，不可修改 -->
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="editForm.username" disabled />
+          </el-form-item>
+          <!-- 邮箱：必填字段，需要验证格式 -->
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="editForm.email" placeholder="请输入邮箱" />
+          </el-form-item>
+          <!-- 手机号：必填字段，需要验证格式 -->
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="editForm.mobile" placeholder="请输入手机号" />
+          </el-form-item>
+          <!-- 角色：下拉选择框 -->
+          <el-form-item label="角色" prop="role_name">
+            <el-select v-model="editForm.role_name" placeholder="请选择角色" style="width: 100%">
+              <el-option label="超级管理员" value="超级管理员" />
+              <el-option label="管理员" value="管理员" />
+              <el-option label="普通用户" value="普通用户" />
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <!-- 对话框底部按钮 -->
+        <template #footer>
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleEditSubmit">确定</el-button>
+        </template>
+      </el-dialog>
+
       <!-- 分页组件：处理大量用户数据的分页展示 -->
       <div class="pagination-container">
         <el-pagination
-          :current-page="1"
+          v-model:current-page="pagination.pagenum"
+          v-model:page-size="pagination.pagesize"
           :page-sizes="[10, 20, 30, 50]"
-          :page-size="10"
+          :total="pagination.total"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="15"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
         />
       </div>
     </el-card>
@@ -73,55 +119,237 @@
 <script setup>
 // 导入 Vue 3 的 Composition API：ref 用于创建响应式数据，onMounted 是生命周期钩子
 import { ref, onMounted } from 'vue'
+// 导入 Element Plus 的消息提示和弹窗组件
+import { ElMessage, ElMessageBox } from 'element-plus'
+// 导入用户相关的 API 方法
+import { getUsersList, deleteUser, updateUserState, updateUser, getUserById } from '@/api/users'
 
 // 定义响应式数据变量
 // 搜索关键词，双向绑定到搜索输入框，初始为空字符串
 const searchQuery = ref('')
 // 用户列表数组，用于存储用户数据，初始为空数组
 const userList = ref([])
+// 分页数据对象，存储分页相关信息
+const pagination = ref({
+  pagenum: 1, // 当前页码
+  pagesize: 10, // 每页显示条数
+  total: 0 // 总条数
+})
+
+// 编辑对话框相关数据
+// 控制编辑对话框的显示与隐藏
+const editDialogVisible = ref(false)
+// 编辑表单的引用，用于表单验证
+const editFormRef = ref(null)
+// 编辑表单的数据对象
+const editForm = ref({
+  id: '',
+  username: '',
+  email: '',
+  mobile: '',
+  role_name: ''
+})
+
+// 表单验证规则
+const editFormRules = {
+  // 邮箱验证规则
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] }
+  ],
+  // 手机号验证规则（放宽：只需 11 位数字）
+  mobile: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^\d{11}$/, message: '请输入 11 位手机号码', trigger: ['blur', 'change'] }
+  ],
+  // 角色验证规则
+  role_name: [
+    { required: true, message: '请选择角色', trigger: 'change' }
+  ]
+}
+
+/**
+ * 获取用户列表数据
+ * 异步函数，从后端 API 获取用户数据并更新到响应式变量中
+ */
+const fetchUsersList = async () => {
+  try {
+    // 调用 API 获取用户列表，传递查询参数
+    const response = await getUsersList({
+      query: searchQuery.value,
+      pagenum: pagination.value.pagenum,
+      pagesize: pagination.value.pagesize
+    })
+
+    // 更新用户列表数据
+    userList.value = response.users
+    // 更新总条数
+    pagination.value.total = response.total
+  } catch (error) {
+    // 请求失败时显示错误提示
+    ElMessage.error('获取用户列表失败：' + error.message)
+  }
+}
+
+/**
+ * 处理搜索操作
+ * 重置页码为第一页，然后重新获取数据
+ */
+const handleSearch = () => {
+  pagination.value.pagenum = 1
+  fetchUsersList()
+}
+
+/**
+ * 处理用户状态切换
+ * @param {Object} row - 当前行用户数据
+ */
+const handleStateChange = async (row) => {
+  try {
+    // 调用 API 更新用户状态
+    await updateUserState(row.id, row.mg_state)
+    // 显示成功提示
+    ElMessage.success(`用户 ${row.username} 状态已${row.mg_state ? '启用' : '禁用'}`)
+  } catch (error) {
+    // 如果更新失败，恢复状态开关
+    row.mg_state = !row.mg_state
+    ElMessage.error('状态修改失败：' + error.message)
+  }
+}
+
+/**
+ * 处理编辑用户操作
+ * 打开编辑用户对话框，加载用户数据并预填充到表单
+ * @param {Object} row - 当前行用户数据
+ */
+const handleEdit = async (row) => {
+  try {
+    // 调用 API 获取用户详情数据
+    const response = await getUserById(row.id)
+
+    // 将用户数据填充到表单中
+    editForm.value = {
+      id: response.id,
+      username: response.username,
+      email: response.email,
+      mobile: response.mobile,
+      role_name: response.role_name
+    }
+
+    // 打开编辑对话框
+    editDialogVisible.value = true
+  } catch (error) {
+    // 获取用户详情失败
+    ElMessage.error('获取用户信息失败：' + error.message)
+  }
+}
+
+/**
+ * 处理删除用户操作
+ * 弹出确认对话框，确认后调用删除 API
+ * @param {Object} row - 当前行用户数据
+ */
+const handleDelete = async (row) => {
+  try {
+    // 弹出确认对话框，等待用户确认
+    await ElMessageBox.confirm(
+      `确定要删除用户 "${row.username}" 吗？此操作不可恢复！`,
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    // 用户确认后，调用删除 API
+    await deleteUser(row.id)
+
+    // 显示成功提示
+    ElMessage.success('删除成功')
+
+    // 重新获取用户列表数据
+    await fetchUsersList()
+  } catch (error) {
+    // 用户取消操作或删除失败
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败：' + error.message)
+    }
+  }
+}
+
+/**
+ * 处理编辑表单提交
+ * 验证表单后调用 API 更新用户信息
+ */
+const handleEditSubmit = async () => {
+  try {
+    // 验证表单
+    await editFormRef.value.validate()
+
+    // 调用 API 更新用户信息
+    await updateUser(editForm.value.id, {
+      email: editForm.value.email,
+      mobile: editForm.value.mobile,
+      role_name: editForm.value.role_name
+    })
+
+    // 显示成功提示
+    ElMessage.success('用户信息更新成功')
+
+    // 关闭对话框
+    editDialogVisible.value = false
+
+    // 重新获取用户列表数据
+    await fetchUsersList()
+  } catch (error) {
+    // 表单验证失败或更新失败
+    if (error !== false) {
+      ElMessage.error('更新失败：' + error.message)
+    }
+  }
+}
+
+/**
+ * 处理对话框关闭事件
+ * 重置表单状态
+ */
+const handleDialogClose = () => {
+  // 重置表单验证状态
+  editFormRef.value?.resetFields()
+  // 清空表单数据
+  editForm.value = {
+    id: '',
+    username: '',
+    email: '',
+    mobile: '',
+    role_name: ''
+  }
+}
+
+/**
+ * 处理每页显示条数变化
+ * @param {Number} val - 新的每页显示条数
+ */
+const handleSizeChange = (val) => {
+  pagination.value.pagesize = val
+  pagination.value.pagenum = 1 // 改变每页条数时，重置为第一页
+  fetchUsersList()
+}
+
+/**
+ * 处理当前页码变化
+ * @param {Number} val - 新的页码
+ */
+const handleCurrentChange = (val) => {
+  pagination.value.pagenum = val
+  fetchUsersList()
+}
 
 // 组件挂载后的生命周期钩子：组件首次渲染后执行
-onMounted(async () => {
-  // 模拟从后端 API 获取用户数据
-  // 在实际开发中，这里应该调用后端接口，例如：await api.getUserList()
-  userList.value = [
-    {
-      id: '1001',
-      username: '张三',
-      email: 'zhangsan@example.com',
-      mobile: '13800138001',
-      role_name: '管理员',
-      mg_state: true
-    },
-    {
-      id: '1002',
-      username: '李四',
-      email: 'lisi@example.com',
-      mobile: '13800138002',
-      role_name: '普通用户',
-      mg_state: true
-    },
-    {
-      id: '1003',
-      username: '王五',
-      email: 'wangwu@example.com',
-      mobile: '13800138003',
-      role_name: '超级管理员',
-      mg_state: false
-    },
-    {
-      id: '1004',
-      username: '赵六',
-      email: 'zhaoliu@example.com',
-      mobile: '13800138004',
-      role_name: '普通用户',
-      mg_state: true
-    }
-  ]
-
-  // TODO: 实际开发中应该调用真实的后端 API
-  // 示例：const response = await api.getUsers()
-  //      userList.value = response.data
+onMounted(() => {
+  // 页面加载时获取用户列表数据
+  fetchUsersList()
 })
 </script>
 
