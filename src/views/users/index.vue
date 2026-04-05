@@ -4,13 +4,11 @@
     <!-- 卡片容器：白色背景卡片，包含所有用户管理功能 -->
     <el-card class="box-card">
       <!-- 卡片头部：左侧显示标题，右侧放置操作按钮 -->
-      <!-- 替换默认头部 -->
       <template #header>
         <div class="card-header">
-          <span>用户管理</span>
+          <span>{{ $t('user.title') }}</span>
           <!-- 主要操作按钮：用于打开添加用户的对话框 -->
-          <!-- 卡片右上角的按钮 -->
-          <el-button type="primary" size="small" @click="handleAddDialog">添加用户</el-button>
+          <el-button type="primary" size="small" @click="handleAddDialog">{{ $t('user.addUser') }}</el-button>
         </div>
       </template>
 
@@ -19,41 +17,40 @@
         <!-- 搜索输入框：v-model 双向绑定搜索关键词，实时更新 -->
         <el-input
           v-model="searchQuery"
-          placeholder="搜索用户"
+          :placeholder="$t('user.searchPlaceholder')"
           style="width: 200px"
           class="filter-item"
         />
         <!-- 搜索按钮：点击触发搜索操作 -->
-        <el-button type="primary" class="filter-item" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" class="filter-item" @click="handleSearch">{{ $t('user.search') }}</el-button>
       </div>
 
       <!-- 用户数据表格：展示用户列表信息 -->
       <el-table :data="userList" style="width: 100%" stripe>
         <!-- 表格列：用户唯一标识符 -->
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="id" :label="$t('user.id')" width="80" />
         <!-- 表格列：用户登录账号 -->
-        <el-table-column prop="username" label="用户名" width="120" />
+        <el-table-column prop="username" :label="$t('user.username')" width="120" />
         <!-- 表格列：用户联系邮箱 -->
-        <el-table-column prop="email" label="邮箱" width="180" />
+        <el-table-column prop="email" :label="$t('user.email')" width="180" />
         <!-- 表格列：用户手机号码 -->
-        <el-table-column prop="mobile" label="手机号" width="120" />
+        <el-table-column prop="mobile" :label="$t('user.mobile')" width="120" />
         <!-- 表格列：用户权限角色 -->
-        <el-table-column prop="role_name" label="角色" width="100" />
+        <el-table-column prop="role_name" :label="$t('user.role')" width="100" />
         <!-- 表格列：用户启用/禁用状态 -->
-        <el-table-column prop="mg_state" label="状态" width="80">
+        <el-table-column prop="mg_state" :label="$t('user.state')" width="80">
           <template #default="scope">
             <!-- 状态开关：v-model 双向绑定，change 事件触发状态更新 -->
-            <!-- scope.row 获取当前行数据 -->
             <el-switch v-model="scope.row.mg_state" @change="handleStateChange(scope.row)" />
           </template>
         </el-table-column>
         <!-- 表格列：操作按钮列 -->
-        <el-table-column label="操作" width="200">
+        <el-table-column :label="$t('user.operation')" width="200">
           <template #default="scope">
             <!-- 编辑按钮：主要样式，用于修改用户信息 -->
-            <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ $t('common.edit') }}</el-button>
             <!-- 删除按钮：危险样式，用于移除用户 -->
-            <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ $t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -61,7 +58,7 @@
       <!-- 编辑用户的弹窗(对话框)：包含用户信息编辑表单 -->
       <el-dialog
         v-model="editDialogVisible"
-        title="编辑用户"
+        :title="$t('user.editUser')"
         width="500px"
         @close="handleDialogClose"
       >
@@ -73,37 +70,37 @@
           label-width="80px"
         >
           <!-- 用户名：只读字段，不可修改 -->
-          <el-form-item label="用户名" prop="username">
+          <el-form-item :label="$t('user.username')" prop="username">
             <el-input v-model="editForm.username" disabled />
           </el-form-item>
           <!-- 邮箱：必填字段，需要验证格式 -->
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="editForm.email" placeholder="请输入邮箱" />
+          <el-form-item :label="$t('user.email')" prop="email">
+            <el-input v-model="editForm.email" :placeholder="$t('user.emailPlaceholder')" />
           </el-form-item>
           <!-- 手机号：必填字段，需要验证格式 -->
-          <el-form-item label="手机号" prop="mobile">
-            <el-input v-model="editForm.mobile" placeholder="请输入手机号" />
+          <el-form-item :label="$t('user.mobile')" prop="mobile">
+            <el-input v-model="editForm.mobile" :placeholder="$t('user.mobilePlaceholder')" />
           </el-form-item>
           <!-- 角色：下拉选择框 -->
-          <el-form-item label="角色" prop="role_name">
-            <el-select v-model="editForm.role_name" placeholder="请选择角色" style="width: 100%">
-              <el-option label="超级管理员" value="超级管理员" />
-              <el-option label="管理员" value="管理员" />
-              <el-option label="普通用户" value="普通用户" />
+          <el-form-item :label="$t('user.role')" prop="role_name">
+            <el-select v-model="editForm.role_name" :placeholder="$t('user.rolePlaceholder')" style="width: 100%">
+              <el-option :label="$t('user.superAdmin')" value="超级管理员" />
+              <el-option :label="$t('user.admin')" value="管理员" />
+              <el-option :label="$t('user.normalUser')" value="普通用户" />
             </el-select>
           </el-form-item>
         </el-form>
         <!-- 对话框底部按钮 -->
         <template #footer>
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleEditSubmit">确定</el-button>
+          <el-button @click="editDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="handleEditSubmit">{{ $t('common.confirm') }}</el-button>
         </template>
       </el-dialog>
 
       <!-- 添加用户对话框：包含用户信息添加表单 -->
       <el-dialog
         v-model="addDialogVisible"
-        title="添加用户"
+        :title="$t('user.addUser')"
         width="500px"
         @close="handleAddDialogClose"
       >
@@ -115,30 +112,30 @@
           label-width="80px"
         >
           <!-- 用户名：必填字段 -->
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="addForm.username" placeholder="请输入用户名" />
+          <el-form-item :label="$t('user.username')" prop="username">
+            <el-input v-model="addForm.username" :placeholder="$t('user.usernamePlaceholder')" />
           </el-form-item>
           <!-- 邮箱：必填字段，需要验证格式 -->
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="addForm.email" placeholder="请输入邮箱" />
+          <el-form-item :label="$t('user.email')" prop="email">
+            <el-input v-model="addForm.email" :placeholder="$t('user.emailPlaceholder')" />
           </el-form-item>
           <!-- 手机号：必填字段，需要验证格式 -->
-          <el-form-item label="手机号" prop="mobile">
-            <el-input v-model="addForm.mobile" placeholder="请输入手机号" />
+          <el-form-item :label="$t('user.mobile')" prop="mobile">
+            <el-input v-model="addForm.mobile" :placeholder="$t('user.mobilePlaceholder')" />
           </el-form-item>
           <!-- 角色：下拉选择框 -->
-          <el-form-item label="角色" prop="role_name">
-            <el-select v-model="addForm.role_name" placeholder="请选择角色" style="width: 100%">
-              <el-option label="超级管理员" value="超级管理员" />
-              <el-option label="管理员" value="管理员" />
-              <el-option label="普通用户" value="普通用户" />
+          <el-form-item :label="$t('user.role')" prop="role_name">
+            <el-select v-model="addForm.role_name" :placeholder="$t('user.rolePlaceholder')" style="width: 100%">
+              <el-option :label="$t('user.superAdmin')" value="超级管理员" />
+              <el-option :label="$t('user.admin')" value="管理员" />
+              <el-option :label="$t('user.normalUser')" value="普通用户" />
             </el-select>
           </el-form-item>
         </el-form>
         <!-- 对话框底部按钮 -->
         <template #footer>
-          <el-button @click="addDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleAddSubmit">确定</el-button>
+          <el-button @click="addDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="handleAddSubmit">{{ $t('common.confirm') }}</el-button>
         </template>
       </el-dialog>
 
@@ -161,10 +158,15 @@
 <script setup>
 // 导入 Vue 3 的 Composition API：ref 用于创建响应式数据，onMounted 是生命周期钩子
 import { ref, onMounted } from 'vue'
+// 导入 Vue i18n
+import { useI18n } from 'vue-i18n'
 // 导入 Element Plus 的消息提示和弹窗组件
 import { ElMessage, ElMessageBox } from 'element-plus'
 // 导入用户相关的 API 方法
 import { getUsersList, deleteUser, updateUserState, updateUser, getUserById, addUser } from '@/api/users'
+
+// 使用 i18n
+const { t } = useI18n()
 
 // 定义响应式数据变量
 // 搜索关键词，双向绑定到搜索输入框，初始为空字符串
@@ -196,22 +198,22 @@ const editForm = ref({
 const editFormRules = {
   // 邮箱验证规则
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] }
+    { required: true, message: t('common.pleaseEnter') + t('user.email'), trigger: 'blur' },
+    { type: 'email', message: t('user.emailPlaceholder'), trigger: ['blur', 'change'] }
   ],
   // 手机号验证规则（放宽：只需 11 位数字）
   mobile: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^\d{11}$/, message: '请输入 11 位手机号码', trigger: ['blur', 'change'] }
+    { required: true, message: t('common.pleaseEnter') + t('user.mobile'), trigger: 'blur' },
+    { pattern: /^\d{11}$/, message: t('user.mobilePlaceholder'), trigger: ['blur', 'change'] }
   ],
   // 角色验证规则
   role_name: [
-    { required: true, message: '请选择角色', trigger: 'change' }
+    { required: true, message: t('user.rolePlaceholder'), trigger: 'change' }
   ]
 }
 
 // 添加用户对话框相关数据
-// 控制添加用户对话框的显示与隐藏
+// 控制添加用户���话框的显示与隐藏
 const addDialogVisible = ref(false)
 // 添加表单的引用，用于表单验证
 const addFormRef = ref(null)
@@ -227,22 +229,22 @@ const addForm = ref({
 const addFormRules = {
   // 用户名验证规则
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { required: true, message: t('common.pleaseEnter') + t('user.username'), trigger: 'blur' },
     { min: 2, max: 20, message: '用户名长度在 2 到 20 个字符', trigger: ['blur', 'change'] }
   ],
   // 邮箱验证规则
   email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] }
+    { required: true, message: t('common.pleaseEnter') + t('user.email'), trigger: 'blur' },
+    { type: 'email', message: t('user.emailPlaceholder'), trigger: ['blur', 'change'] }
   ],
   // 手机号验证规则
   mobile: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^\d{11}$/, message: '请输入 11 位手机号码', trigger: ['blur', 'change'] }
+    { required: true, message: t('common.pleaseEnter') + t('user.mobile'), trigger: 'blur' },
+    { pattern: /^\d{11}$/, message: t('user.mobilePlaceholder'), trigger: ['blur', 'change'] }
   ],
   // 角色验证规则
   role_name: [
-    { required: true, message: '请选择角色', trigger: 'change' }
+    { required: true, message: t('user.rolePlaceholder'), trigger: 'change' }
   ]
 }
 
@@ -265,7 +267,7 @@ const fetchUsersList = async () => {
     pagination.value.total = response.total
   } catch (error) {
     // 请求失败时显示错误提示
-    ElMessage.error('获取用户列表失败：' + error.message)
+    ElMessage.error(t('user.fetchFailed') + '：' + error.message)
   }
 }
 
@@ -287,11 +289,12 @@ const handleStateChange = async (row) => {
     // 调用 API 更新用户状态
     await updateUserState(row.id, row.mg_state)
     // 显示成功提示
-    ElMessage.success(`用户 ${row.username} 状态已${row.mg_state ? '启用' : '禁用'}`)
+    const stateText = row.mg_state ? t('user.enabled') : t('user.disabled')
+    ElMessage.success(t('user.stateChangeSuccess', { username: row.username, state: stateText }))
   } catch (error) {
     // 如果更新失败，恢复状态开关
     row.mg_state = !row.mg_state
-    ElMessage.error('状态修改失败：' + error.message)
+    ElMessage.error(t('user.stateChangeFailed') + '：' + error.message)
   }
 }
 
@@ -318,7 +321,7 @@ const handleEdit = async (row) => {
     editDialogVisible.value = true
   } catch (error) {
     // 获取用户详情失败
-    ElMessage.error('获取用户信息失败：' + error.message)
+    ElMessage.error(t('user.getUserFailed') + '：' + error.message)
   }
 }
 
@@ -331,11 +334,11 @@ const handleDelete = async (row) => {
   try {
     // 弹出确认对话框，等待用户确认
     await ElMessageBox.confirm(
-      `确定要删除用户 "${row.username}" 吗？此操作不可恢复！`,
-      '删除确认',
+      t('user.deleteConfirm', { username: row.username }),
+      t('dialog.deleteConfirmTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     )
@@ -344,14 +347,14 @@ const handleDelete = async (row) => {
     await deleteUser(row.id)
 
     // 显示成功提示
-    ElMessage.success('删除成功')
+    ElMessage.success(t('user.deleteSuccess'))
 
     // 重新获取用户列表数据
     await fetchUsersList()
   } catch (error) {
     // 用户取消操作或删除失败
     if (error !== 'cancel') {
-      ElMessage.error('删除失败：' + error.message)
+      ElMessage.error(t('user.deleteFailed') + '：' + error.message)
     }
   }
 }
@@ -373,7 +376,7 @@ const handleEditSubmit = async () => {
     })
 
     // 显示成功提示
-    ElMessage.success('用户信息更新成功')
+    ElMessage.success(t('user.updateSuccess'))
 
     // 关闭对话框
     editDialogVisible.value = false
@@ -383,7 +386,7 @@ const handleEditSubmit = async () => {
   } catch (error) {
     // 表单验证失败或更新失败
     if (error !== false) {
-      ElMessage.error('更新失败：' + error.message)
+      ElMessage.error(t('user.updateFailed') + '：' + error.message)
     }
   }
 }
@@ -434,7 +437,7 @@ const handleAddSubmit = async () => {
     await addUser(addForm.value)
 
     // 显示成功提示
-    ElMessage.success('用户添加成功')
+    ElMessage.success(t('user.addSuccess'))
 
     // 关闭对话框
     addDialogVisible.value = false
@@ -444,7 +447,7 @@ const handleAddSubmit = async () => {
   } catch (error) {
     // 表单验证失败或添加失败
     if (error !== false) {
-      ElMessage.error('添加失败：' + error.message)
+      ElMessage.error(t('user.addFailed') + '：' + error.message)
     }
   }
 }

@@ -18,7 +18,7 @@
         <el-icon>
           <component :is="iconList[index]"></component>
         </el-icon>
-        <span>{{ item.authName }}</span>
+        <span>{{ getParentMenuTitle(item.authName) }}</span>
       </template>
       <el-menu-item
         :index="'/' + it.path"
@@ -40,8 +40,10 @@
 <script setup>
 import { menuList } from '@/api/menu'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import variables from '@/styles/variables.scss'
 
+const { t } = useI18n()
 const iconList = ref(['user', 'setting', 'shop', 'tickets', 'pie-chart'])
 const icon = ref('menu')
 
@@ -51,6 +53,21 @@ const initMenusList = async () => {
   menusList.value = await menuList()
 }
 initMenusList()
+
+// 父菜单名称映射到 i18n key
+const parentMenuMap = {
+  用户管理: 'userManagement',
+  权限管理: 'rightsManagement',
+  商品管理: 'goodsManagement',
+  订单管理: 'ordersManagement',
+  数据统计: 'reportsManagement'
+}
+
+// 获取父菜单标题（支持国际化）
+const getParentMenuTitle = (authName) => {
+  const i18nKey = parentMenuMap[authName]
+  return i18nKey ? t(`menus.${i18nKey}`) : authName
+}
 
 const savePath = (path) => {
   sessionStorage.setItem('path', `/${path}`)
