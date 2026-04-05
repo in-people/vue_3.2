@@ -376,83 +376,160 @@ Mock.mock(/\/api\/roles/, 'get', () => {
   return successResponse(roles)
 })
 
-// 模拟商品列表
-Mock.mock(/\/api\/goods(\?.*)?$/, 'get', () => {
-  const goods = []
-  const brands = ['Apple', '华为', '小米', 'OPPO', 'vivo', '三星', '联想', '戴尔', '索尼', 'LG']
-  const categories = ['手机', '电脑', '平板', '耳机', '音响', '相机', '键盘', '鼠标', '充电器', '数据线']
+// 缓存商品数据，确保每次请求返回相同的数据
+const cachedGoodsList = (() => {
+  const goods = [
+    { goods_id: '1001', goods_name: 'iPhone 15 Pro Max', goods_price: 9999, goods_number: 100, goods_weight: 221, goods_state: 0, add_time: 1512954923, upd_time: 1512954923, hot_mumber: 580, is_promote: true, goods_cat: '1,5,12', goods_introduce: '苹果最新旗舰手机', pics: [], attrs: [] },
+    { goods_id: '1002', goods_name: '华为 Mate 60 Pro', goods_price: 6999, goods_number: 200, goods_weight: 225, goods_state: 1, add_time: 1512960000, upd_time: 1512960000, hot_mumber: 890, is_promote: true, goods_cat: '1,5,13', goods_introduce: '华为年度旗舰', pics: [], attrs: [] },
+    { goods_id: '1003', goods_name: '小米14 Ultra', goods_price: 6499, goods_number: 150, goods_weight: 230, goods_state: 2, add_time: 1512965000, upd_time: 1512965000, hot_mumber: 670, is_promote: false, goods_cat: '1,5,14', goods_introduce: '小米影像旗舰', pics: [], attrs: [] },
+    { goods_id: '1004', goods_name: 'OPPO Find X7', goods_price: 5999, goods_number: 120, goods_weight: 210, goods_state: 1, add_time: 1512970000, upd_time: 1512970000, hot_mumber: 450, is_promote: false, goods_cat: '1,5,15', goods_introduce: 'OPPO旗舰手机', pics: [], attrs: [] },
+    { goods_id: '1005', goods_name: 'vivo X100 Pro', goods_price: 5499, goods_number: 180, goods_weight: 215, goods_state: 0, add_time: 1512975000, upd_time: 1512975000, hot_mumber: 520, is_promote: true, goods_cat: '1,5,16', goods_introduce: 'vivo影像旗舰', pics: [], attrs: [] },
+    { goods_id: '1006', goods_name: '三星 Galaxy S24 Ultra', goods_price: 9699, goods_number: 90, goods_weight: 232, goods_state: 2, add_time: 1512980000, upd_time: 1512980000, hot_mumber: 380, is_promote: false, goods_cat: '1,5,17', goods_introduce: '三星年度旗舰', pics: [], attrs: [] },
+    { goods_id: '1007', goods_name: '联想拯救者 Y9000P', goods_price: 12999, goods_number: 50, goods_weight: 2600, goods_state: 1, add_time: 1512985000, upd_time: 1512985000, hot_mumber: 290, is_promote: true, goods_cat: '1,3,8', goods_introduce: '电竞游戏本', pics: [], attrs: [] },
+    { goods_id: '1008', goods_name: '戴尔 XPS 15', goods_price: 15999, goods_number: 40, goods_weight: 1800, goods_state: 2, add_time: 1512990000, upd_time: 1512990000, hot_mumber: 180, is_promote: false, goods_cat: '1,3,9', goods_introduce: '轻薄全能本', pics: [], attrs: [] },
+    { goods_id: '1009', goods_name: '索尼 WH-1000XM5', goods_price: 2499, goods_number: 300, goods_weight: 250, goods_state: 1, add_time: 1512995000, upd_time: 1512995000, hot_mumber: 780, is_promote: true, goods_cat: '1,7,20', goods_introduce: '降噪耳机旗舰', pics: [], attrs: [] },
+    { goods_id: '1010', goods_name: 'iPad Pro 12.9', goods_price: 8999, goods_number: 80, goods_weight: 682, goods_state: 0, add_time: 1513000000, upd_time: 1513000000, hot_mumber: 460, is_promote: false, goods_cat: '1,4,18', goods_introduce: '苹果平板旗舰', pics: [], attrs: [] },
+    { goods_id: '1011', goods_name: 'AirPods Pro 2', goods_price: 1899, goods_number: 500, goods_weight: 56, goods_state: 2, add_time: 1513005000, upd_time: 1513005000, hot_mumber: 1200, is_promote: true, goods_cat: '1,7,21', goods_introduce: '苹果降噪耳机', pics: [], attrs: [] },
+    { goods_id: '1012', goods_name: 'MacBook Pro 14', goods_price: 16999, goods_number: 30, goods_weight: 1600, goods_state: 1, add_time: 1513010000, upd_time: 1513010000, hot_mumber: 340, is_promote: false, goods_cat: '1,3,10', goods_introduce: '苹果专业笔记本', pics: [], attrs: [] },
+    { goods_id: '1013', goods_name: '华为 MateBook X Pro', goods_price: 10999, goods_number: 60, goods_weight: 1200, goods_state: 0, add_time: 1513015000, upd_time: 1513015000, hot_mumber: 210, is_promote: true, goods_cat: '1,3,11', goods_introduce: '华为轻薄旗舰', pics: [], attrs: [] },
+    { goods_id: '1014', goods_name: '小米平板 6 Max', goods_price: 3299, goods_number: 200, goods_weight: 490, goods_state: 2, add_time: 1513020000, upd_time: 1513020000, hot_mumber: 590, is_promote: false, goods_cat: '1,4,19', goods_introduce: '小米大屏平板', pics: [], attrs: [] },
+    { goods_id: '1015', goods_name: '罗技 MX Master 3S', goods_price: 699, goods_number: 400, goods_weight: 141, goods_state: 1, add_time: 1513025000, upd_time: 1513025000, hot_mumber: 680, is_promote: false, goods_cat: '1,6,22', goods_introduce: '无线办公鼠标', pics: [], attrs: [] },
+    { goods_id: '1016', goods_name: 'Keychron K8 Pro', goods_price: 598, goods_number: 350, goods_weight: 950, goods_state: 0, add_time: 1513030000, upd_time: 1513030000, hot_mumber: 420, is_promote: true, goods_cat: '1,6,23', goods_introduce: '机械键盘', pics: [], attrs: [] },
+    { goods_id: '1017', goods_name: '佳能 EOS R6 Mark II', goods_price: 16499, goods_number: 20, goods_weight: 670, goods_state: 2, add_time: 1513035000, upd_time: 1513035000, hot_mumber: 150, is_promote: false, goods_cat: '1,8,24', goods_introduce: '专业微单相机', pics: [], attrs: [] },
+    { goods_id: '1018', goods_name: '任天堂 Switch OLED', goods_price: 2599, goods_number: 150, goods_weight: 420, goods_state: 1, add_time: 1513040000, upd_time: 1513040000, hot_mumber: 890, is_promote: true, goods_cat: '1,9,25', goods_introduce: '游戏主机', pics: [], attrs: [] },
+    { goods_id: '1019', goods_name: 'Apple Watch Series 9', goods_price: 3199, goods_number: 250, goods_weight: 42, goods_state: 0, add_time: 1513045000, upd_time: 1513045000, hot_mumber: 560, is_promote: false, goods_cat: '1,10,26', goods_introduce: '智能手表', pics: [], attrs: [] },
+    { goods_id: '1020', goods_name: 'Bose QC45', goods_price: 1999, goods_number: 280, goods_weight: 240, goods_state: 2, add_time: 1513050000, upd_time: 1513050000, hot_mumber: 470, is_promote: true, goods_cat: '1,7,27', goods_introduce: '降噪耳机', pics: [], attrs: [] },
+    { goods_id: '1021', goods_name: '大疆 Mini 4 Pro', goods_price: 4788, goods_number: 70, goods_weight: 249, goods_state: 1, add_time: 1513055000, upd_time: 1513055000, hot_mumber: 320, is_promote: false, goods_cat: '1,11,28', goods_introduce: '迷你无人机', pics: [], attrs: [] },
+    { goods_id: '1022', goods_name: 'Kindle Oasis', goods_price: 2399, goods_number: 180, goods_weight: 188, goods_state: 0, add_time: 1513060000, upd_time: 1513060000, hot_mumber: 280, is_promote: false, goods_cat: '1,12,29', goods_introduce: '电子书阅读器', pics: [], attrs: [] },
+    { goods_id: '1023', goods_name: '索尼 A7M5', goods_price: 18999, goods_number: 25, goods_weight: 730, goods_state: 2, add_time: 1513065000, upd_time: 1513065000, hot_mumber: 190, is_promote: true, goods_cat: '1,8,30', goods_introduce: '全画幅微单', pics: [], attrs: [] },
+    { goods_id: '1024', goods_name: '华为 FreeBuds Pro 3', goods_price: 1499, goods_number: 450, goods_weight: 62, goods_state: 1, add_time: 1513070000, upd_time: 1513070000, hot_mumber: 920, is_promote: true, goods_cat: '1,7,31', goods_introduce: '华为降噪耳机', pics: [], attrs: [] },
+    { goods_id: '1025', goods_name: 'Surface Laptop 5', goods_price: 10888, goods_number: 45, goods_weight: 1270, goods_state: 0, add_time: 1513075000, upd_time: 1513075000, hot_mumber: 230, is_promote: false, goods_cat: '1,3,32', goods_introduce: '微软笔记本', pics: [], attrs: [] },
+    { goods_id: '1026', goods_name: 'LG C3 OLED 65寸', goods_price: 12999, goods_number: 35, goods_weight: 32000, goods_state: 2, add_time: 1513080000, upd_time: 1513080000, hot_mumber: 160, is_promote: false, goods_cat: '1,13,33', goods_introduce: 'OLED电视', pics: [], attrs: [] },
+    { goods_id: '1027', goods_name: '小米手环 8', goods_price: 259, goods_number: 600, goods_weight: 28, goods_state: 1, add_time: 1513085000, upd_time: 1513085000, hot_mumber: 1500, is_promote: true, goods_cat: '1,10,34', goods_introduce: '智能手环', pics: [], attrs: [] },
+    { goods_id: '1028', goods_name: '尼康 Z8', goods_price: 27999, goods_number: 15, goods_weight: 910, goods_state: 0, add_time: 1513090000, upd_time: 1513090000, hot_mumber: 120, is_promote: false, goods_cat: '1,8,35', goods_introduce: '专业微单相机', pics: [], attrs: [] },
+    { goods_id: '1029', goods_name: '惠普战66', goods_price: 4299, goods_number: 100, goods_weight: 1900, goods_state: 2, add_time: 1513095000, upd_time: 1513095000, hot_mumber: 380, is_promote: false, goods_cat: '1,3,36', goods_introduce: '商务笔记本', pics: [], attrs: [] },
+    { goods_id: '1030', goods_name: 'Apple TV 4K', goods_price: 1699, goods_number: 120, goods_weight: 425, goods_state: 1, add_time: 1513100000, upd_time: 1513100000, hot_mumber: 240, is_promote: true, goods_cat: '1,14,37', goods_introduce: '网络电视盒子', pics: [], attrs: [] }
+  ]
+  return goods
+})()
 
-  for (let i = 1; i <= 50; i++) {
-    const brand = brands[Mock.Random.integer(0, brands.length - 1)]
-    const category = categories[Mock.Random.integer(0, categories.length - 1)]
-    goods.push(
-      Mock.mock({
-        goods_id: String(i + 1000),
-        goods_name: brand + category + ' ' + Mock.Random.pick(['Pro', 'Max', 'Ultra', 'Plus', 'Lite', '标准版', '旗舰版']),
-        goods_price: Mock.Random.integer(100, 19999),
-        goods_number: Mock.Random.integer(0, 2000),
-        goods_weight: Mock.Random.integer(100, 5000),
-        goods_state: Mock.Random.integer(0, 1), // 0: 未审核, 1: 已审核
-        add_time: Date.now() - Mock.Random.integer(1, 180) * 24 * 60 * 60 * 1000,
-        upd_time: Date.now() - Mock.Random.integer(0, 30) * 24 * 60 * 60 * 1000,
-        hot_mumber: Mock.Random.integer(0, 2000),
-        is_promote: Mock.Random.boolean(),
-        goods_cat: '1,' + Mock.Random.integer(1, 10) + ',' + Mock.Random.integer(1, 20)
-      })
+// 模拟商品列表接口
+Mock.mock(/\/api\/goods(\?.*)?$/, 'get', (options) => {
+  // 解析查询参数
+  const url = new URL(options.url, 'http://localhost')
+  const query = url.searchParams.get('query') || ''
+  const pagenum = parseInt(url.searchParams.get('pagenum')) || 1
+  const pagesize = parseInt(url.searchParams.get('pagesize')) || 10
+
+  // 根据查询条件过滤商品
+  let filteredGoods = cachedGoodsList
+  if (query) {
+    filteredGoods = cachedGoodsList.filter(good =>
+      good.goods_name.toLowerCase().includes(query.toLowerCase())
     )
   }
 
+  // 计算分页数据
+  const total = filteredGoods.length
+  const startIndex = (pagenum - 1) * pagesize
+  const endIndex = startIndex + pagesize
+  const paginatedGoods = filteredGoods.slice(startIndex, endIndex)
+
   return successResponse({
-    total: 50,
-    pagenum: 1,
-    goods
+    total,
+    pagenum,
+    goods: paginatedGoods
   })
 })
 
 // 模拟商品详情查询
 Mock.mock(/\/api\/goods\/\d+$/, 'get', (options) => {
   const id = options.url.match(/\/api\/goods\/(\d+)$/)[1]
-  return successResponse({
-    goods_id: id,
-    goods_name: Mock.Random.ctitle(5, 15),
-    goods_price: Mock.Random.integer(100, 9999),
-    goods_number: Mock.Random.integer(1, 1000),
-    goods_weight: Mock.Random.integer(100, 5000),
-    goods_state: 1,
-    add_time: Date.now() - Mock.Random.integer(1, 30) * 24 * 60 * 60 * 1000,
-    upd_time: Date.now(),
-    hot_mumber: Mock.Random.integer(0, 999),
-    is_promote: Mock.Random.boolean(),
-    goods_cat: '1,5,12',
-    pics: [
-      { pics_id: '1', pics_big: 'http://example.com/pic1.jpg', pics_mid: 'http://example.com/pic1_mid.jpg', pics_sma: 'http://example.com/pic1_sma.jpg' }
-    ],
-    attrs: [
-      { attr_id: '1', attr_value: '黑色', attr_name: '颜色' },
-      { attr_id: '2', attr_value: '128GB', attr_name: '容量' }
-    ]
-  })
+  // 从缓存列表中查找对应的商品数据
+  const good = cachedGoodsList.find(g => g.goods_id === id)
+
+  if (good) {
+    return successResponse(good)
+  } else {
+    return errorResponse('商品不存在')
+  }
 })
 
 // 模拟添加商品
-Mock.mock(/\/api\/goods$/, 'post', () => {
-  return successResponse({
-    message: '添加商品成功'
-  })
+Mock.mock(/\/api\/goods$/, 'post', (options) => {
+  const body = JSON.parse(options.body)
+
+  // 生成新的商品ID（当前最大ID + 1）
+  const maxId = Math.max(...cachedGoodsList.map(g => parseInt(g.goods_id)))
+  const newId = String(maxId + 1)
+
+  // 创建新商品对象
+  const newGood = {
+    goods_id: newId,
+    goods_name: body.goods_name,
+    goods_price: body.goods_price,
+    goods_number: body.goods_number,
+    goods_weight: body.goods_weight,
+    goods_state: 0, // 默认为未审核
+    add_time: Math.floor(Date.now() / 1000),
+    upd_time: Math.floor(Date.now() / 1000),
+    hot_mumber: 0,
+    is_promote: false,
+    goods_cat: body.goods_cat || '',
+    goods_introduce: body.goods_introduce || '',
+    pics: body.pics || [],
+    attrs: body.attrs || []
+  }
+
+  // 添加到缓存列表的开头
+  cachedGoodsList.unshift(newGood)
+
+  return successResponse(newGood)
 })
 
 // 模拟编辑商品
-Mock.mock(/\/api\/goods\/\d+$/, 'put', () => {
-  return successResponse({
-    message: '更新商品成功'
-  })
+Mock.mock(/\/api\/goods\/\d+$/, 'put', (options) => {
+  const id = options.url.match(/\/api\/goods\/(\d+)$/)[1]
+  const body = JSON.parse(options.body)
+
+  // 从缓存列表中查找对应的商品索引
+  const goodIndex = cachedGoodsList.findIndex(g => g.goods_id === id)
+
+  if (goodIndex !== -1) {
+    // 更新缓存中的商品数据
+    cachedGoodsList[goodIndex] = {
+      ...cachedGoodsList[goodIndex],
+      goods_name: body.goods_name,
+      goods_price: body.goods_price,
+      goods_number: body.goods_number,
+      goods_weight: body.goods_weight,
+      goods_introduce: body.goods_introduce,
+      upd_time: Math.floor(Date.now() / 1000),
+      pics: body.pics || cachedGoodsList[goodIndex].pics,
+      attrs: body.attrs || cachedGoodsList[goodIndex].attrs
+    }
+
+    return successResponse(cachedGoodsList[goodIndex])
+  } else {
+    return errorResponse('商品不存在')
+  }
 })
 
 // 模拟删除商品
-Mock.mock(/\/api\/goods\/\d+$/, 'delete', () => {
-  return successResponse({
-    message: '删除商品成功'
-  })
+Mock.mock(/\/api\/goods\/\d+$/, 'delete', (options) => {
+  const id = options.url.match(/\/api\/goods\/(\d+)$/)[1]
+
+  // 从缓存列表中查找对应的商品索引
+  const goodIndex = cachedGoodsList.findIndex(g => g.goods_id === id)
+
+  if (goodIndex !== -1) {
+    // 从缓存中删除商品
+    cachedGoodsList.splice(goodIndex, 1)
+
+    return successResponse(null)
+  } else {
+    return errorResponse('商品不存在')
+  }
 })
 
 // 模拟商品状态修改

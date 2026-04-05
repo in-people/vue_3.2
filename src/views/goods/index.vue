@@ -8,7 +8,7 @@
         <div class="card-header">
           <span>商品管理</span>
           <!-- 主要操作按钮：用于打开添加商品的对话框 -->
-          <el-button type="primary" size="small" @click="handleAdd">添加商品</el-button>
+          <el-button type="primary" size="small" @click="handleAddDialog">添加商品</el-button>
         </div>
       </template>
 
@@ -17,7 +17,7 @@
         <!-- 搜索输入框：v-model 双向绑定搜索关键词，实时更新 -->
         <el-input
           v-model="searchQuery"
-          placeholder="搜索商品名称"
+          placeholder="搜索商品"
           style="width: 200px"
           class="filter-item"
           clearable
@@ -32,7 +32,7 @@
         <!-- 表格列：商品唯一标识符 -->
         <el-table-column prop="goods_id" label="商品ID" width="100" />
         <!-- 表格列：商品名称 -->
-        <el-table-column prop="goods_name" label="商品名称" width="300" />
+        <el-table-column prop="goods_name" label="商品名称" width="300" show-overflow-tooltip />
         <!-- 表格列：商品价格（元） -->
         <el-table-column prop="goods_price" label="价格" width="120">
           <template #default="scope">
@@ -51,8 +51,8 @@
         <el-table-column prop="goods_state" label="状态" width="100">
           <template #default="scope">
             <!-- 状态标签：根据状态显示不同颜色 -->
-            <el-tag :type="scope.row.goods_state === 1 ? 'success' : 'info'">
-              {{ scope.row.goods_state === 1 ? '已审核' : '未审核' }}
+            <el-tag :type="getStateType(scope.row.goods_state)">
+              {{ getStateText(scope.row.goods_state) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -84,6 +84,105 @@
         </el-table-column>
       </el-table>
 
+      <!-- 编辑商品的弹窗(对话框)：包含商品信息编辑表单 -->
+      <el-dialog
+        v-model="editDialogVisible"
+        title="编辑商品"
+        width="600px"
+        @close="handleDialogClose"
+      >
+        <!-- 表单组件：包含编辑商品所需的所有字段 -->
+        <el-form
+          ref="editFormRef"
+          :model="editForm"
+          :rules="editFormRules"
+          label-width="100px"
+        >
+          <!-- 商品ID：只读字段，不可修改 -->
+          <el-form-item label="商品ID" prop="goods_id">
+            <el-input v-model="editForm.goods_id" disabled />
+          </el-form-item>
+          <!-- 商品名称：必填字段 -->
+          <el-form-item label="商品名称" prop="goods_name">
+            <el-input v-model="editForm.goods_name" placeholder="请输入商品名称" />
+          </el-form-item>
+          <!-- 商品价格：必填字段 -->
+          <el-form-item label="价格" prop="goods_price">
+            <el-input-number v-model="editForm.goods_price" :min="0" :precision="2" style="width: 100%" />
+          </el-form-item>
+          <!-- 商品数量：必填字段 -->
+          <el-form-item label="数量" prop="goods_number">
+            <el-input-number v-model="editForm.goods_number" :min="0" style="width: 100%" />
+          </el-form-item>
+          <!-- 商品重量：必填字段 -->
+          <el-form-item label="重量(克)" prop="goods_weight">
+            <el-input-number v-model="editForm.goods_weight" :min="0" style="width: 100%" />
+          </el-form-item>
+          <!-- 商品介绍：可选字段 -->
+          <el-form-item label="商品介绍" prop="goods_introduce">
+            <el-input v-model="editForm.goods_introduce" type="textarea" :rows="3" placeholder="请输入商品介绍" />
+          </el-form-item>
+        </el-form>
+        <!-- 对话框底部按钮 -->
+        <template #footer>
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleEditSubmit">确定</el-button>
+        </template>
+      </el-dialog>
+
+      <!-- 添加商品对话框：包含商品信息添加表单 -->
+      <el-dialog
+        v-model="addDialogVisible"
+        title="添加商品"
+        width="600px"
+        @close="handleAddDialogClose"
+      >
+        <!-- 表单组件：包含添加商品所需的所有字段 -->
+        <el-form
+          ref="addFormRef"
+          :model="addForm"
+          :rules="addFormRules"
+          label-width="100px"
+        >
+          <!-- 商品名称：必填字段 -->
+          <el-form-item label="商品名称" prop="goods_name">
+            <el-input v-model="addForm.goods_name" placeholder="请输入商品名称" />
+          </el-form-item>
+          <!-- 商品分类：必填字段 -->
+          <el-form-item label="商品分类" prop="goods_cat">
+            <el-cascader
+              v-model="addForm.goods_cat_arr"
+              :options="categoryOptions"
+              :props="{ expandTrigger: 'hover' }"
+              placeholder="请选择商品分类"
+              style="width: 100%"
+              clearable
+            />
+          </el-form-item>
+          <!-- 商品价格：必填字段 -->
+          <el-form-item label="价格" prop="goods_price">
+            <el-input-number v-model="addForm.goods_price" :min="0" :precision="2" style="width: 100%" />
+          </el-form-item>
+          <!-- 商品数量：必填字段 -->
+          <el-form-item label="数量" prop="goods_number">
+            <el-input-number v-model="addForm.goods_number" :min="0" style="width: 100%" />
+          </el-form-item>
+          <!-- 商品重量：必填字段 -->
+          <el-form-item label="重量(克)" prop="goods_weight">
+            <el-input-number v-model="addForm.goods_weight" :min="0" style="width: 100%" />
+          </el-form-item>
+          <!-- 商品介绍：可选字段 -->
+          <el-form-item label="商品介绍" prop="goods_introduce">
+            <el-input v-model="addForm.goods_introduce" type="textarea" :rows="3" placeholder="请输入商品介绍" />
+          </el-form-item>
+        </el-form>
+        <!-- 对话框底部按钮 -->
+        <template #footer>
+          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleAddSubmit">确定</el-button>
+        </template>
+      </el-dialog>
+
       <!-- 分页组件：处理大量商品数据的分页展示 -->
       <div class="pagination-container">
         <el-pagination
@@ -106,7 +205,7 @@ import { ref, onMounted } from 'vue'
 // 导入 Element Plus 的消息提示和弹窗组件
 import { ElMessage, ElMessageBox } from 'element-plus'
 // 导入商品相关的 API 方法
-import { getGoodsList, deleteGoods } from '@/api/goods'
+import { getGoodsList, deleteGoods, updateGoods, getGoodsById, addGoods } from '@/api/goods'
 
 // 定义响应式数据变量
 // 搜索关键词，双向绑定到搜索输入框，初始为空字符串
@@ -120,21 +219,122 @@ const pagination = ref({
   total: 0 // 总条数
 })
 
-/**
- * 格式化时间戳为可读的日期时间格式
- * @param {Number} timestamp - Unix 时间戳（毫秒）
- * @returns {String} 格式化后的日期时间字符串
- */
-const formatDate = (timestamp) => {
-  if (!timestamp) return '-'
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  const seconds = String(date.getSeconds()).padStart(2, '0')
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+// 编辑对话框相关数据
+// 控制编辑对话框的显示与隐藏
+const editDialogVisible = ref(false)
+// 编辑表单的引用，用于表单验证
+const editFormRef = ref(null)
+// 编辑表单的数据对象
+const editForm = ref({
+  goods_id: '',
+  goods_name: '',
+  goods_price: 0,
+  goods_number: 0,
+  goods_weight: 0,
+  goods_introduce: ''
+})
+
+// 表单验证规则
+const editFormRules = {
+  // 商品名称验证规则
+  goods_name: [
+    { required: true, message: '请输入商品名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '商品名称长度在 2 到 50 个字符', trigger: ['blur', 'change'] }
+  ],
+  // 商品价格验证规则
+  goods_price: [
+    { required: true, message: '请输入商品价格', trigger: 'blur' }
+  ],
+  // 商品数量验证规则
+  goods_number: [
+    { required: true, message: '请输入商品数量', trigger: 'blur' }
+  ],
+  // 商品重量验证规则
+  goods_weight: [
+    { required: true, message: '请输入商品重量', trigger: 'blur' }
+  ]
+}
+
+// 添加商品对话框相关数据
+// 控制添加商品对话框的显示与隐藏
+const addDialogVisible = ref(false)
+// 添加表单的引用，用于表单验证
+const addFormRef = ref(null)
+// 添加表单的数据对象
+const addForm = ref({
+  goods_name: '',
+  // eslint-disable-next-line camelcase
+  goods_cat: '',
+  goods_cat_arr: [],
+  goods_price: 0,
+  goods_number: 0,
+  goods_weight: 0,
+  goods_introduce: ''
+})
+
+// 商品分类选项（模拟三级分类）
+const categoryOptions = [
+  {
+    value: '1',
+    label: '家用电器',
+    children: [
+      {
+        value: '5',
+        label: '���机',
+        children: [
+          { value: '12', label: '智能手机' },
+          { value: '13', label: '老人机' }
+        ]
+      },
+      {
+        value: '4',
+        label: '平板',
+        children: [
+          { value: '18', label: 'iPad' },
+          { value: '19', label: 'Android平板' }
+        ]
+      }
+    ]
+  },
+  {
+    value: '3',
+    label: '数码产品',
+    children: [
+      {
+        value: '6',
+        label: '电脑',
+        children: [
+          { value: '8', label: '游戏本' },
+          { value: '9', label: '轻薄本' }
+        ]
+      }
+    ]
+  }
+]
+
+// 添加表单验证规则
+const addFormRules = {
+  // 商品名称验证规则
+  goods_name: [
+    { required: true, message: '请输入商品名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '商品名称长度在 2 到 50 个字符', trigger: ['blur', 'change'] }
+  ],
+  // 商品分类验证规则
+  goods_cat_arr: [
+    { required: true, message: '请选择商品分类', trigger: 'change' }
+  ],
+  // 商品价格验证规则
+  goods_price: [
+    { required: true, message: '请输入商品价格', trigger: 'blur' }
+  ],
+  // 商品数量验证规则
+  goods_number: [
+    { required: true, message: '请输入商品数量', trigger: 'blur' }
+  ],
+  // 商品重量验证规则
+  goods_weight: [
+    { required: true, message: '请输入商品重量', trigger: 'blur' }
+  ]
 }
 
 /**
@@ -170,20 +370,76 @@ const handleSearch = () => {
 }
 
 /**
- * 处理添加商品操作
- * TODO: 打开添加商品对话框，实现表单填写和提交功能
+ * 格式化时间戳为可读的日期时间格式
+ * @param {Number} timestamp - Unix 时间戳（秒）
+ * @returns {String} 格式化后的日期时间字符串
  */
-const handleAdd = () => {
-  ElMessage.info('添加商品功能开发中...')
+const formatDate = (timestamp) => {
+  if (!timestamp) return '-'
+  const date = new Date(timestamp * 1000)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+/**
+ * 获取商品状态文本
+ * @param {Number} state - 商品状态（0: 未通过, 1: 审核中, 2: 已审核）
+ * @returns {String} 状态文本
+ */
+const getStateText = (state) => {
+  const stateMap = {
+    0: '未通过',
+    1: '审核中',
+    2: '已审核'
+  }
+  return stateMap[state] || '未知'
+}
+
+/**
+ * 获取商品状态标签类型
+ * @param {Number} state - 商品状态
+ * @returns {String} 标签类型
+ */
+const getStateType = (state) => {
+  const typeMap = {
+    0: 'danger',
+    1: 'warning',
+    2: 'success'
+  }
+  return typeMap[state] || 'info'
 }
 
 /**
  * 处理编辑商品操作
- * TODO: 打开编辑商品对话框，预填充数据并实现更新功能
+ * 打开编辑商品对话框，加载商品数据并预填充到表单
  * @param {Object} row - 当前行商品数据
  */
-const handleEdit = (row) => {
-  ElMessage.info('编辑商品功能开发中... 商品ID: ' + row.goods_id)
+const handleEdit = async (row) => {
+  try {
+    // 调用 API 获取商品详情数据
+    const response = await getGoodsById(row.goods_id)
+
+    // 将商品数据填充到表单中
+    editForm.value = {
+      goods_id: response.goods_id,
+      goods_name: response.goods_name,
+      goods_price: response.goods_price,
+      goods_number: response.goods_number,
+      goods_weight: response.goods_weight,
+      goods_introduce: response.goods_introduce || ''
+    }
+
+    // 打开编辑对话框
+    editDialogVisible.value = true
+  } catch (error) {
+    // 获取商品详情失败
+    ElMessage.error('获取商品信息失败：' + error.message)
+  }
 }
 
 /**
@@ -217,6 +473,138 @@ const handleDelete = async (row) => {
     if (error !== 'cancel') {
       ElMessage.error('删除失败：' + error.message)
     }
+  }
+}
+
+/**
+ * 处理编辑表单提交
+ * 验证表单后调用 API 更新商品信息
+ */
+const handleEditSubmit = async () => {
+  try {
+    // 验证表单
+    await editFormRef.value.validate()
+
+    // 调用 API 更新商品信息
+    await updateGoods(editForm.value.goods_id, {
+      goods_name: editForm.value.goods_name,
+      goods_price: editForm.value.goods_price,
+      goods_number: editForm.value.goods_number,
+      goods_weight: editForm.value.goods_weight,
+      goods_introduce: editForm.value.goods_introduce
+    })
+
+    // 显示成功提示
+    ElMessage.success('商品信息更新成功')
+
+    // 关闭对话框
+    editDialogVisible.value = false
+
+    // 重新获取商品列表数据
+    await fetchGoodsList()
+  } catch (error) {
+    // 表单验证失败或更新失败
+    if (error !== false) {
+      ElMessage.error('更新失败：' + error.message)
+    }
+  }
+}
+
+/**
+ * 处理对话框关闭事件
+ * 重置表单状态
+ */
+const handleDialogClose = () => {
+  // 重置表单验证状态
+  editFormRef.value?.resetFields()
+  // 清空表单数据
+  editForm.value = {
+    goods_id: '',
+    goods_name: '',
+    goods_price: 0,
+    goods_number: 0,
+    goods_weight: 0,
+    goods_introduce: ''
+  }
+}
+
+/**
+ * 处理打开添加商品对话框
+ * 清空表单并显示对话框
+ */
+const handleAddDialog = () => {
+  // 清空表单数据
+  addForm.value = {
+    goods_name: '',
+    // eslint-disable-next-line camelcase
+    goods_cat: '',
+    goods_cat_arr: [],
+    goods_price: 0,
+    goods_number: 0,
+    goods_weight: 0,
+    goods_introduce: ''
+  }
+  // 打开对话框
+  addDialogVisible.value = true
+}
+
+/**
+ * 处理添加商品表单提交
+ * 验证表单后调用 API 添加商品
+ */
+const handleAddSubmit = async () => {
+  try {
+    // 验证表单
+    await addFormRef.value.validate()
+
+    // 将分类数组转换为逗号分隔的字符串
+    // eslint-disable-next-line camelcase
+    const goods_cat = addForm.value.goods_cat_arr.join(',')
+
+    // 调用 API 添加商品
+    await addGoods({
+      goods_name: addForm.value.goods_name,
+      // eslint-disable-next-line camelcase
+      goods_cat,
+      goods_price: addForm.value.goods_price,
+      goods_number: addForm.value.goods_number,
+      goods_weight: addForm.value.goods_weight,
+      goods_introduce: addForm.value.goods_introduce
+    })
+
+    // 显示成功提示
+    ElMessage.success('商品添加成功')
+
+    // 关闭对话框
+    addDialogVisible.value = false
+
+    // 重新获取商品列表数据
+    await fetchGoodsList()
+  } catch (error) {
+    // 表单验证失败或添加失败
+    if (error !== false) {
+      ElMessage.error('添加失败：' + error.message)
+    }
+  }
+}
+
+/**
+ * 处理添加对话框关闭事件
+ * 重置表单状态
+ */
+const handleAddDialogClose = () => {
+  // 重置表单验证状态
+  addFormRef.value?.resetFields()
+  // 清空表单数据
+  addForm.value = {
+    goods_name: '',
+    // eslint-disable-next-line camelcase
+    goods_cat: '',
+    goods_cat_arr: [],
+    goods_price: 0,
+    goods_number: 0,
+    goods_weight: 0,
+    goods_introduce: ''
   }
 }
 
