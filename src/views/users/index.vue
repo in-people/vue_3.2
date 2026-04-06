@@ -20,6 +20,8 @@
           :placeholder="$t('user.searchPlaceholder')"
           style="width: 200px"
           class="filter-item"
+          clearable
+          @clear="handleSearch"
         />
         <!-- 搜索按钮：点击触发搜索操作 -->
         <el-button type="primary" class="filter-item" @click="handleSearch">{{ $t('user.search') }}</el-button>
