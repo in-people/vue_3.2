@@ -616,6 +616,57 @@ Mock.mock(/\/api\/categories/, 'get', () => {
   return successResponse(categories)
 })
 
+// 模拟数据统计 - 基于时间的折线图（用户来源）
+Mock.mock(/\/api\/reports\/type\/1$/, 'get', () => {
+  return successResponse({
+    xAxis: {
+      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    },
+    series: [
+      {
+        name: '直接访问',
+        type: 'line',
+        stack: 'Total',
+        data: [320, 332, 301, 334, 390, 330, 320]
+      },
+      {
+        name: '邮件营销',
+        type: 'line',
+        stack: 'Total',
+        data: [120, 132, 101, 134, 90, 230, 210]
+      },
+      {
+        name: '联盟广告',
+        type: 'line',
+        stack: 'Total',
+        data: [220, 182, 191, 234, 290, 330, 310]
+      },
+      {
+        name: '视频广告',
+        type: 'line',
+        stack: 'Total',
+        data: [150, 232, 201, 154, 190, 330, 410]
+      },
+      {
+        name: '搜索引擎',
+        type: 'line',
+        stack: 'Total',
+        data: [820, 932, 901, 934, 1290, 1330, 1320]
+      }
+    ]
+  })
+})
+
+// 模拟数据统计 - 关键指标卡片数据
+Mock.mock(/\/api\/reports\/statistics$/, 'get', () => {
+  return successResponse({
+    totalUsers: 1250,
+    totalGoods: 856,
+    totalOrders: 3420,
+    totalAmount: 125680
+  })
+})
+
 // 模拟订单列表
 Mock.mock(/\/api\/orders(\?.*)?$/, 'get', () => {
   const orders = []

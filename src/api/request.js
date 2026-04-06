@@ -34,9 +34,14 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    console.log(error.response)
-    error.response && ElMessage.error(error.response.data)
-    return Promise.reject(new Error(error.response.data))
+    console.log('请求错误:', error)
+    // 安全地处理错误响应
+    const errorMsg = error.response?.data?.meta?.msg ||
+                     error.response?.data ||
+                     error.message ||
+                     '请求失败'
+    ElMessage.error(errorMsg)
+    return Promise.reject(new Error(errorMsg))
   }
 )
 export default service

@@ -99,5 +99,27 @@ export default {
     cancel: 'Cancel',
     pleaseEnter: 'Please enter',
     required: 'Required'
+  },
+  reports: {
+    title: 'Data Reports',
+    last7Days: 'Last 7 Days',
+    last30Days: 'Last 30 Days',
+    last90Days: 'Last 90 Days',
+    totalUsers: 'Total Users',
+    totalGoods: 'Total Goods',
+    totalOrders: 'Total Orders',
+    totalAmount: 'Total Amount',
+    userSourceTrend: 'User Source Trend',
+    dataSourceDistribution: 'Data Source Distribution',
+    sourceDetails: 'Source Details',
+    source: 'Source',
+    monday: 'Mon',
+    tuesday: 'Tue',
+    wednesday: 'Wed',
+    thursday: 'Thu',
+    friday: 'Fri',
+    saturday: 'Sat',
+    sunday: 'Sun',
+    total: 'Total'
   }
 }

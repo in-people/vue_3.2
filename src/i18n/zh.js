@@ -99,5 +99,27 @@ export default {
     cancel: '取消',
     pleaseEnter: '请输入',
     required: '不能为空'
+  },
+  reports: {
+    title: '数据报表',
+    last7Days: '最近7天',
+    last30Days: '最近30天',
+    last90Days: '最近90天',
+    totalUsers: '总用户数',
+    totalGoods: '总商品数',
+    totalOrders: '总订单数',
+    totalAmount: '总金额',
+    userSourceTrend: '用户来源趋势',
+    dataSourceDistribution: '数据来源分布',
+    sourceDetails: '来源详细数据',
+    source: '来源',
+    monday: '周一',
+    tuesday: '周二',
+    wednesday: '周三',
+    thursday: '周四',
+    friday: '周五',
+    saturday: '周六',
+    sunday: '周日',
+    total: '总计'
   }
 }
