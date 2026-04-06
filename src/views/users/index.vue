@@ -27,32 +27,40 @@
 
       <!-- 用户数据表格：展示用户列表信息 -->
       <el-table :data="userList" style="width: 100%" stripe>
-        <!-- 表格列：用户唯一标识符 -->
-        <el-table-column prop="id" :label="$t('user.id')" width="80" />
-        <!-- 表格列：用户登录账号 -->
-        <el-table-column prop="username" :label="$t('user.username')" width="120" />
-        <!-- 表格列：用户联系邮箱 -->
-        <el-table-column prop="email" :label="$t('user.email')" width="180" />
-        <!-- 表格列：用户手机号码 -->
-        <el-table-column prop="mobile" :label="$t('user.mobile')" width="120" />
-        <!-- 表格列：用户权限角色 -->
-        <el-table-column prop="role_name" :label="$t('user.role')" width="100" />
-        <!-- 表格列：用户启用/禁用状态 -->
-        <el-table-column prop="mg_state" :label="$t('user.state')" width="80">
-          <template #default="scope">
-            <!-- 状态开关：v-model 双向绑定，change 事件触发状态更新 -->
-            <el-switch v-model="scope.row.mg_state" @change="handleStateChange(scope.row)" />
-          </template>
-        </el-table-column>
-        <!-- 表格列：操作按钮列 -->
-        <el-table-column :label="$t('user.operation')" width="200">
-          <template #default="scope">
-            <!-- 编辑按钮：主要样式，用于修改用户信息 -->
-            <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ $t('common.edit') }}</el-button>
-            <!-- 删除按钮：危险样式，用于移除用户 -->
-            <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ $t('common.delete') }}</el-button>
-          </template>
-        </el-table-column>
+        <!-- 循环渲染表格列 -->
+        <template v-for="(column, index) in tableColumns" :key="index">
+          <!-- 状态列：使用自定义插槽 -->
+          <el-table-column
+            v-if="column.slot === 'state'"
+            :prop="column.prop"
+            :label="$t(column.labelKey)"
+            :width="column.width"
+          >
+            <template #default="scope">
+              <el-switch v-model="scope.row.mg_state" @change="handleStateChange(scope.row)" />
+            </template>
+          </el-table-column>
+
+          <!-- 操作列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'action'"
+            :label="$t(column.labelKey)"
+            :width="column.width"
+          >
+            <template #default="scope">
+              <el-button type="primary" size="small" @click="handleEdit(scope.row)">{{ $t('common.edit') }}</el-button>
+              <el-button type="danger" size="small" @click="handleDelete(scope.row)">{{ $t('common.delete') }}</el-button>
+            </template>
+          </el-table-column>
+
+          <!-- 普通列：直接渲染 -->
+          <el-table-column
+            v-else
+            :prop="column.prop"
+            :label="$t(column.labelKey)"
+            :width="column.width"
+          />
+        </template>
       </el-table>
 
       <!-- 编辑用户的弹窗(对话框)：包含用户信息编辑表单 -->
@@ -164,6 +172,8 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 // 导入用户相关的 API 方法
 import { getUsersList, deleteUser, updateUserState, updateUser, getUserById, addUser } from '@/api/users'
+// 导入表格列配置
+import { tableColumns } from './tableColumns'
 
 // 使用 i18n
 const { t } = useI18n()
@@ -260,6 +270,8 @@ const fetchUsersList = async () => {
       pagenum: pagination.value.pagenum,
       pagesize: pagination.value.pagesize
     })
+
+    // console.log(response)
 
     // 更新用户列表数据
     userList.value = response.users
