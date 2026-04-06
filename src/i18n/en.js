@@ -35,6 +35,7 @@ export default {
     mobile: 'Mobile',
     role: 'Role',
     state: 'State',
+    createTime: 'Create Time',
     operation: 'Operation',
     // 表单
     usernamePlaceholder: 'Please enter username',

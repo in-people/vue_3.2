@@ -41,6 +41,18 @@
             </template>
           </el-table-column>
 
+          <!-- 时间列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'time'"
+            :prop="column.prop"
+            :label="$t(column.labelKey)"
+            :width="column.width"
+          >
+            <template #default="scope">
+              {{ formatTime(scope.row.create_time) }}
+            </template>
+          </el-table-column>
+
           <!-- 操作列：使用自定义插槽 -->
           <el-table-column
             v-else-if="column.slot === 'action'"
@@ -174,6 +186,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getUsersList, deleteUser, updateUserState, updateUser, getUserById, addUser } from '@/api/users'
 // 导入表格列配置
 import { tableColumns } from './tableColumns'
+// 导入时间格式化工具
+import { formatTime } from '@/utils/filters'
 
 // 使用 i18n
 const { t } = useI18n()

@@ -135,36 +135,36 @@ Mock.mock(/\/api\/menus/, 'get', () => {
 // 缓存用户数据，确保每次请求返回相同的数据
 const cachedUsersList = (() => {
   const users = [
-    { id: '1001', username: '张三', email: 'zhangsan@example.com', mobile: '13800138001', role_name: '超级管理员', mg_state: true },
-    { id: '1002', username: '李四', email: 'lisi@example.com', mobile: '13800138002', role_name: '管理员', mg_state: true },
-    { id: '1003', username: '王五', email: 'wangwu@example.com', mobile: '13800138003', role_name: '普通用户', mg_state: false },
-    { id: '1004', username: '赵六', email: 'zhaoliu@example.com', mobile: '13800138004', role_name: '普通用户', mg_state: true },
-    { id: '1005', username: '钱七', email: 'qianqi@example.com', mobile: '13800138005', role_name: '管理员', mg_state: true },
-    { id: '1006', username: '孙八', email: 'sunba@example.com', mobile: '13800138006', role_name: '普通用户', mg_state: true },
-    { id: '1007', username: '周九', email: 'zhoujiu@example.com', mobile: '13800138007', role_name: '超级管理员', mg_state: false },
-    { id: '1008', username: '吴十', email: 'wushi@example.com', mobile: '13800138008', role_name: '普通用户', mg_state: true },
-    { id: '1009', username: '郑十一', email: 'zhengshiyi@example.com', mobile: '13800138009', role_name: '管理员', mg_state: true },
-    { id: '1010', username: '王十二', email: 'wangshier@example.com', mobile: '13800138010', role_name: '普通用户', mg_state: true },
-    { id: '1011', username: '冯小明', email: 'fengxiaoming@example.com', mobile: '13800138011', role_name: '管理员', mg_state: false },
-    { id: '1012', username: '陈小红', email: 'chenxiaohong@example.com', mobile: '13800138012', role_name: '普通用户', mg_state: true },
-    { id: '1013', username: '褚小刚', email: 'chuxiaogang@example.com', mobile: '13800138013', role_name: '超级管理员', mg_state: true },
-    { id: '1014', username: '卫小丽', email: 'weixiaoli@example.com', mobile: '13800138014', role_name: '普通用户', mg_state: true },
-    { id: '1015', username: '蒋小华', email: 'jiangxiaohua@example.com', mobile: '13800138015', role_name: '管理员', mg_state: false },
-    { id: '1016', username: '沈小龙', email: 'shenxiaolong@example.com', mobile: '13800138016', role_name: '普通用户', mg_state: true },
-    { id: '1017', username: '韩小燕', email: 'hanxiaoyan@example.com', mobile: '13800138017', role_name: '管理员', mg_state: true },
-    { id: '1018', username: '杨小军', email: 'yangxiaojun@example.com', mobile: '13800138018', role_name: '普通用户', mg_state: true },
-    { id: '1019', username: '朱小梅', email: 'zhuxiaomei@example.com', mobile: '13800138019', role_name: '超级管理员', mg_state: false },
-    { id: '1020', username: '秦小强', email: 'qinxiaoqiang@example.com', mobile: '13800138020', role_name: '普通用户', mg_state: true },
-    { id: '1021', username: '尤小芳', email: 'youxiaofang@example.com', mobile: '13800138021', role_name: '管理员', mg_state: true },
-    { id: '1022', username: '许小杰', email: 'xuxiaojie@example.com', mobile: '13800138022', role_name: '普通用户', mg_state: true },
-    { id: '1023', username: '何小娜', email: 'hexiaona@example.com', mobile: '13800138023', role_name: '管理员', mg_state: false },
-    { id: '1024', username: '吕小涛', email: 'luxiaotao@example.com', mobile: '13800138024', role_name: '普通用户', mg_state: true },
-    { id: '1025', username: '施小磊', email: 'shixiaolei@example.com', mobile: '13800138025', role_name: '超级管理员', mg_state: true },
-    { id: '1026', username: '张小伟', email: 'zhangxiaowei@example.com', mobile: '13800138026', role_name: '普通用户', mg_state: true },
-    { id: '1027', username: '孔小静', email: 'kongxiaojing@example.com', mobile: '13800138027', role_name: '管理员', mg_state: false },
-    { id: '1028', username: '曹小敏', email: 'caoxiaomin@example.com', mobile: '13800138028', role_name: '普通用户', mg_state: true },
-    { id: '1029', username: '严小波', email: 'yanxiaobo@example.com', mobile: '13800138029', role_name: '管理员', mg_state: true },
-    { id: '1030', username: '华小婷', email: 'huaxiaoting@example.com', mobile: '13800138030', role_name: '普通用户', mg_state: true }
+    { id: '1001', username: '张三', email: 'zhangsan@example.com', mobile: '13800138001', role_name: '超级管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 365 * 24 * 60 * 60 },
+    { id: '1002', username: '李四', email: 'lisi@example.com', mobile: '13800138002', role_name: '管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 320 * 24 * 60 * 60 },
+    { id: '1003', username: '王五', email: 'wangwu@example.com', mobile: '13800138003', role_name: '普通用户', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 280 * 24 * 60 * 60 },
+    { id: '1004', username: '赵六', email: 'zhaoliu@example.com', mobile: '13800138004', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 250 * 24 * 60 * 60 },
+    { id: '1005', username: '钱七', email: 'qianqi@example.com', mobile: '13800138005', role_name: '管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 220 * 24 * 60 * 60 },
+    { id: '1006', username: '孙八', email: 'sunba@example.com', mobile: '13800138006', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 200 * 24 * 60 * 60 },
+    { id: '1007', username: '周九', email: 'zhoujiu@example.com', mobile: '13800138007', role_name: '超级管理员', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 180 * 24 * 60 * 60 },
+    { id: '1008', username: '吴十', email: 'wushi@example.com', mobile: '13800138008', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 160 * 24 * 60 * 60 },
+    { id: '1009', username: '郑十一', email: 'zhengshiyi@example.com', mobile: '13800138009', role_name: '管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 140 * 24 * 60 * 60 },
+    { id: '1010', username: '王十二', email: 'wangshier@example.com', mobile: '13800138010', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 120 * 24 * 60 * 60 },
+    { id: '1011', username: '冯小明', email: 'fengxiaoming@example.com', mobile: '13800138011', role_name: '管理员', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 110 * 24 * 60 * 60 },
+    { id: '1012', username: '陈小红', email: 'chenxiaohong@example.com', mobile: '13800138012', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 100 * 24 * 60 * 60 },
+    { id: '1013', username: '褚小刚', email: 'chuxiaogang@example.com', mobile: '13800138013', role_name: '超级管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 90 * 24 * 60 * 60 },
+    { id: '1014', username: '卫小丽', email: 'weixiaoli@example.com', mobile: '13800138014', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 85 * 24 * 60 * 60 },
+    { id: '1015', username: '蒋小华', email: 'jiangxiaohua@example.com', mobile: '13800138015', role_name: '管理员', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 80 * 24 * 60 * 60 },
+    { id: '1016', username: '沈小龙', email: 'shenxiaolong@example.com', mobile: '13800138016', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 75 * 24 * 60 * 60 },
+    { id: '1017', username: '韩小燕', email: 'hanxiaoyan@example.com', mobile: '13800138017', role_name: '管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 70 * 24 * 60 * 60 },
+    { id: '1018', username: '杨小军', email: 'yangxiaojun@example.com', mobile: '13800138018', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 65 * 24 * 60 * 60 },
+    { id: '1019', username: '朱小梅', email: 'zhuxiaomei@example.com', mobile: '13800138019', role_name: '超级管理员', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 60 * 24 * 60 * 60 },
+    { id: '1020', username: '秦小强', email: 'qinxiaoqiang@example.com', mobile: '13800138020', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 55 * 24 * 60 * 60 },
+    { id: '1021', username: '尤小芳', email: 'youxiaofang@example.com', mobile: '13800138021', role_name: '管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 50 * 24 * 60 * 60 },
+    { id: '1022', username: '许小杰', email: 'xuxiaojie@example.com', mobile: '13800138022', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 45 * 24 * 60 * 60 },
+    { id: '1023', username: '何小娜', email: 'hexiaona@example.com', mobile: '13800138023', role_name: '管理员', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 40 * 24 * 60 * 60 },
+    { id: '1024', username: '吕小涛', email: 'luxiaotao@example.com', mobile: '13800138024', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 35 * 24 * 60 * 60 },
+    { id: '1025', username: '施小磊', email: 'shixiaolei@example.com', mobile: '13800138025', role_name: '超级管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60 },
+    { id: '1026', username: '张小伟', email: 'zhangxiaowei@example.com', mobile: '13800138026', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 25 * 24 * 60 * 60 },
+    { id: '1027', username: '孔小静', email: 'kongxiaojing@example.com', mobile: '13800138027', role_name: '管理员', mg_state: false, create_time: Math.floor(Date.now() / 1000) - 20 * 24 * 60 * 60 },
+    { id: '1028', username: '曹小敏', email: 'caoxiaomin@example.com', mobile: '13800138028', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 15 * 24 * 60 * 60 },
+    { id: '1029', username: '严小波', email: 'yanxiaobo@example.com', mobile: '13800138029', role_name: '管理员', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 10 * 24 * 60 * 60 },
+    { id: '1030', username: '华小婷', email: 'huaxiaoting@example.com', mobile: '13800138030', role_name: '普通用户', mg_state: true, create_time: Math.floor(Date.now() / 1000) - 5 * 24 * 60 * 60 }
   ]
   return users
 })()
@@ -228,7 +228,8 @@ Mock.mock(/\/api\/users$/, 'post', (options) => {
     email: body.email,
     mobile: body.mobile,
     role_name: body.role_name,
-    mg_state: true // 默认启用
+    mg_state: true, // 默认启用
+    create_time: Math.floor(Date.now() / 1000) // 当前时间戳（秒）
   }
 
   // 添加到缓存列表的开头

@@ -35,6 +35,7 @@ export default {
     mobile: '手机号',
     role: '角色',
     state: '状态',
+    createTime: '创建时间',
     operation: '操作',
     // 表单
     usernamePlaceholder: '请输入用户名',

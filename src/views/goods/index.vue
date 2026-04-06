@@ -29,59 +29,94 @@
 
       <!-- 商品数据表格：展示商品列表信息 -->
       <el-table :data="goodsList" style="width: 100%" stripe border>
-        <!-- 表格列：商品唯一标识符 -->
-        <el-table-column prop="goods_id" label="商品ID" width="100" />
-        <!-- 表格列：商品名称 -->
-        <el-table-column prop="goods_name" label="商品名称" width="300" show-overflow-tooltip />
-        <!-- 表格列：商品价格（元） -->
-        <el-table-column prop="goods_price" label="价格" width="120">
-          <template #default="scope">
-            ￥{{ scope.row.goods_price }}
-          </template>
-        </el-table-column>
-        <!-- 表格列：商品库存数量 -->
-        <el-table-column prop="goods_number" label="数量" width="100" />
-        <!-- 表格列：商品重量（克） -->
-        <el-table-column prop="goods_weight" label="重量" width="100">
-          <template #default="scope">
-            {{ scope.row.goods_weight }}g
-          </template>
-        </el-table-column>
-        <!-- 表格列：商品上架状态 -->
-        <el-table-column prop="goods_state" label="状态" width="100">
-          <template #default="scope">
-            <!-- 状态标签：根据状态显示不同颜色 -->
-            <el-tag :type="getStateType(scope.row.goods_state)">
-              {{ getStateText(scope.row.goods_state) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <!-- 表格列：商品热度值 -->
-        <el-table-column prop="hot_mumber" label="热度" width="100" />
-        <!-- 表格列：是否促销 -->
-        <el-table-column prop="is_promote" label="促销" width="80">
-          <template #default="scope">
-            <!-- 促销标签：根据促销状态显示 -->
-            <el-tag :type="scope.row.is_promote ? 'danger' : 'info'" size="small">
-              {{ scope.row.is_promote ? '是' : '否' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <!-- 表格列：创建时间 -->
-        <el-table-column prop="add_time" label="创建时间" width="180">
-          <template #default="scope">
-            {{ formatDate(scope.row.add_time) }}
-          </template>
-        </el-table-column>
-        <!-- 表格列：操作按钮列 -->
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="scope">
-            <!-- 编辑按钮：主要样式，用于修改商品信息 -->
-            <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
-            <!-- 删除按钮：危险样式，用于移除商品 -->
-            <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
+        <!-- 循环渲染表格列 -->
+        <template v-for="(column, index) in tableColumns" :key="index">
+          <!-- 价格列：使用自定义插槽 -->
+          <el-table-column
+            v-if="column.slot === 'price'"
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+          >
+            <template #default="scope">
+              ￥{{ scope.row.goods_price }}
+            </template>
+          </el-table-column>
+
+          <!-- 重量列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'weight'"
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+          >
+            <template #default="scope">
+              {{ scope.row.goods_weight }}g
+            </template>
+          </el-table-column>
+
+          <!-- 状态列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'state'"
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+          >
+            <template #default="scope">
+              <el-tag :type="getStateType(scope.row.goods_state)">
+                {{ getStateText(scope.row.goods_state) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+
+          <!-- 促销列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'promote'"
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+          >
+            <template #default="scope">
+              <el-tag :type="scope.row.is_promote ? 'danger' : 'info'" size="small">
+                {{ scope.row.is_promote ? '是' : '否' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+
+          <!-- 时间列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'time'"
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+          >
+            <template #default="scope">
+              {{ formatDate(scope.row.add_time) }}
+            </template>
+          </el-table-column>
+
+          <!-- 操作列：使用自定义插槽 -->
+          <el-table-column
+            v-else-if="column.slot === 'action'"
+            :label="column.label"
+            :width="column.width"
+            :fixed="column.fixed"
+          >
+            <template #default="scope">
+              <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+
+          <!-- 普通列：直接渲染 -->
+          <el-table-column
+            v-else
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+            :show-overflow-tooltip="column.showOverflowTooltip"
+          />
+        </template>
       </el-table>
 
       <!-- 编辑商品的弹窗(对话框)：包含商品信息编辑表单 -->
@@ -206,6 +241,8 @@ import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 // 导入商品相关的 API 方法
 import { getGoodsList, deleteGoods, updateGoods, getGoodsById, addGoods } from '@/api/goods'
+// 导入表格列配置
+import { tableColumns } from './tableColumns'
 
 // 定义响应式数据变量
 // 搜索关键词，双向绑定到搜索输入框，初始为空字符串

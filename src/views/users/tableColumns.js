@@ -35,6 +35,12 @@ export const tableColumns = [
     slot: 'state' // 自定义插槽名称
   },
   {
+    prop: 'create_time',
+    labelKey: 'user.createTime',
+    width: 180,
+    slot: 'time' // 自定义插槽名称
+  },
+  {
     prop: 'action',
     labelKey: 'user.operation',
     width: 200,
